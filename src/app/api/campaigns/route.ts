@@ -229,7 +229,8 @@ export async function POST(request: NextRequest) {
 // ============================================
 
 async function generateChecklists(
-  supabase: ReturnType<typeof createClient>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
   campaignId: string,
   campaignType: string
 ) {
