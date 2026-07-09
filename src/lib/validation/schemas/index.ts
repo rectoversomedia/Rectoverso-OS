@@ -4,7 +4,10 @@
  */
 
 import { z } from 'zod'
-import { createZodEnum } from '@/lib/utils/zod'
+
+// Helper to create enum schemas (compatible with Zod)
+const createZodEnum = <T extends readonly string[]>(values: T) =>
+  z.enum(values as [string, ...string[]])
 
 // ============================================
 // Common Schemas
