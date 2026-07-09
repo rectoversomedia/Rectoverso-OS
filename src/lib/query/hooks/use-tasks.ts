@@ -8,7 +8,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { queryKeys } from '../client'
+import { queryKeys } from '../client.tsx'
 import type {
   Task,
   CreateTask,

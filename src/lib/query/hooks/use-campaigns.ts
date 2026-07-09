@@ -10,7 +10,7 @@ import {
   useInfiniteQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { queryKeys } from '../client'
+import { queryKeys } from '../client.tsx'
 import type {
   Campaign,
   CampaignChecklist,
