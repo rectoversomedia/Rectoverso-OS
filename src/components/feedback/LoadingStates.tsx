@@ -13,15 +13,17 @@ import { cn } from '@/lib/utils'
 
 interface SkeletonProps {
   className?: string
+  style?: React.CSSProperties
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, style }: SkeletonProps) {
   return (
     <div
       className={cn(
         'animate-pulse rounded-md bg-muted',
         className
       )}
+      style={style}
     />
   )
 }
@@ -129,14 +131,15 @@ export function StatsSkeleton({ count = 4 }: { count?: number }) {
 // ============================================
 
 export function ChartSkeleton({ height = 'h-64' }: { height?: string }) {
+  // Pre-defined heights for consistent rendering
+  const heights = ['h-1/2', 'h-3/4', 'h-full', 'h-2/3', 'h-1/3', 'h-full', 'h-4/5', 'h-1/2', 'h-3/4', 'h-full', 'h-2/3', 'h-1/3']
   return (
     <div className={cn('space-y-4', height)}>
       <div className="flex items-end justify-end gap-2 h-full">
         {Array.from({ length: 12 }).map((_, i) => (
           <Skeleton
             key={i}
-            className="flex-1"
-            style={{ height: `${30 + Math.random() * 60}%` }}
+            className={heights[i % heights.length]}
           />
         ))}
       </div>
