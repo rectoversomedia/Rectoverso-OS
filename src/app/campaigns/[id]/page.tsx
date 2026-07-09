@@ -166,7 +166,7 @@ export default function CampaignDetailPage() {
       <div className="flex flex-col items-center justify-center py-12">
         <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
         <h2 className="text-xl font-semibold text-slate-300">Campaign not found</h2>
-        <p className="text-sm text-slate-500 mt-2">
+        <p className="text-sm text-slate-9000 mt-2">
           The campaign you&apos;re looking for doesn&apos;t exist.
         </p>
         <Button className="mt-4" asChild>
@@ -197,7 +197,7 @@ export default function CampaignDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-slate-50">{campaign.name}</h1>
+              <h1 className="text-2xl font-bold text-slate-900">{campaign.name}</h1>
               <Badge className={getStatusColor(campaign.status)} variant="outline">
                 {campaign.status.replace("_", " ")}
               </Badge>
@@ -230,25 +230,25 @@ export default function CampaignDetailPage() {
 
       {/* Overview Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500">Budget</p>
+                <p className="text-xs text-slate-9000">Budget</p>
                 <p className="text-xl font-bold">{formatCurrency(campaign.budget)}</p>
               </div>
               <div className="rounded-full bg-cyan-500/10 p-3">
-                <DollarSign className="h-5 w-5 text-cyan-400" />
+                <DollarSign className="h-5 w-5 text-cyan-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500">KPI Progress</p>
+                <p className="text-xs text-slate-9000">KPI Progress</p>
                 <p className="text-xl font-bold">
                   {getProgressPercentage(campaign.kpi_current, campaign.kpi_target)}%
                 </p>
@@ -261,25 +261,25 @@ export default function CampaignDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500">Current / Target</p>
+                <p className="text-xs text-slate-9000">Current / Target</p>
                 <p className="text-xl font-bold">
                   {campaign.kpi_current.toLocaleString()} / {campaign.kpi_target.toLocaleString()}
                 </p>
               </div>
-              <TrendingUp className="h-5 w-5 text-cyan-400" />
+              <TrendingUp className="h-5 w-5 text-cyan-600" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500">Payment Status</p>
+                <p className="text-xs text-slate-9000">Payment Status</p>
                 <p className="text-xl font-bold capitalize">
                   {campaign.payment_status.replace("_", " ")}
                 </p>
@@ -297,7 +297,7 @@ export default function CampaignDetailPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="bg-slate-800/50">
+        <TabsList className="bg-slate-100">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="checklist">
             Checklist ({completedChecklists}/{checklists.length})
@@ -317,35 +317,35 @@ export default function CampaignDetailPage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="border-slate-800">
+            <Card className="border-slate-200">
               <CardHeader>
                 <CardTitle className="text-lg">Campaign Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-xs text-slate-500">Objective</p>
+                  <p className="text-xs text-slate-9000">Objective</p>
                   <p className="text-sm">{campaign.objective}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-slate-500">Start Date</p>
+                    <p className="text-xs text-slate-9000">Start Date</p>
                     <p className="text-sm font-medium">{formatDate(campaign.start_date)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">End Date</p>
+                    <p className="text-xs text-slate-9000">End Date</p>
                     <p className="text-sm font-medium">{formatDate(campaign.end_date)}</p>
                   </div>
                 </div>
                 {campaign.notes && (
                   <div>
-                    <p className="text-xs text-slate-500">Notes</p>
+                    <p className="text-xs text-slate-9000">Notes</p>
                     <p className="text-sm">{campaign.notes}</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="border-slate-800">
+            <Card className="border-slate-200">
               <CardHeader>
                 <CardTitle className="text-lg">Deliverables</CardTitle>
               </CardHeader>
@@ -353,7 +353,7 @@ export default function CampaignDetailPage() {
                 <ul className="space-y-2">
                   {campaign.deliverables?.map((deliverable, index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-cyan-400" />
+                      <CheckCircle className="h-4 w-4 text-cyan-600" />
                       {deliverable}
                     </li>
                   ))}
@@ -361,33 +361,33 @@ export default function CampaignDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-slate-800">
+            <Card className="border-slate-200">
               <CardHeader>
                 <CardTitle className="text-lg">Tracking Setup</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-xs text-slate-500">Tracking Link</p>
+                  <p className="text-xs text-slate-9000">Tracking Link</p>
                   <p className="text-sm font-mono truncate">{campaign.tracking_link || "-"}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <p className="text-xs text-slate-500">UTM Source</p>
+                    <p className="text-xs text-slate-9000">UTM Source</p>
                     <p className="text-sm font-mono">{campaign.utm_source || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">UTM Medium</p>
+                    <p className="text-xs text-slate-9000">UTM Medium</p>
                     <p className="text-sm font-mono">{campaign.utm_medium || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">UTM Campaign</p>
+                    <p className="text-xs text-slate-9000">UTM Campaign</p>
                     <p className="text-sm font-mono">{campaign.utm_campaign || "-"}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-slate-800">
+            <Card className="border-slate-200">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-amber-400" />
@@ -421,7 +421,7 @@ export default function CampaignDetailPage() {
 
         {/* Checklist Tab */}
         <TabsContent value="checklist" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Campaign Checklist</CardTitle>
@@ -438,8 +438,8 @@ export default function CampaignDetailPage() {
               {groupedChecklists.map((phase) => (
                 <div key={phase.id}>
                   <div className="flex items-center gap-2 mb-3">
-                    <phase.icon className="h-4 w-4 text-cyan-400" />
-                    <h3 className="font-semibold text-slate-200">{phase.label}</h3>
+                    <phase.icon className="h-4 w-4 text-cyan-600" />
+                    <h3 className="font-semibold text-slate-700">{phase.label}</h3>
                     <Badge variant="outline" className="text-xs">
                       {phase.items.filter((i) => checklistState[i.id] === "done").length}/
                       {phase.items.length}
@@ -449,7 +449,7 @@ export default function CampaignDetailPage() {
                     {phase.items.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center gap-3 rounded-lg border border-slate-800 p-3 hover:bg-slate-800/30 transition-colors"
+                        className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 hover:bg-slate-800/30 transition-colors"
                       >
                         <Checkbox
                           checked={checklistState[item.id] === "done"}
@@ -459,14 +459,14 @@ export default function CampaignDetailPage() {
                           <p
                             className={`text-sm ${
                               checklistState[item.id] === "done"
-                                ? "text-slate-500 line-through"
-                                : "text-slate-200"
+                                ? "text-slate-9000 line-through"
+                                : "text-slate-700"
                             }`}
                           >
                             {item.title}
                           </p>
                           {item.due_date && (
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-9000">
                               Due: {formatDate(item.due_date)}
                             </p>
                           )}
@@ -488,7 +488,7 @@ export default function CampaignDetailPage() {
                 </div>
               ))}
               {checklists.length === 0 && (
-                <div className="text-center py-8 text-slate-500">
+                <div className="text-center py-8 text-slate-9000">
                   No checklist items for this campaign
                 </div>
               )}
@@ -505,11 +505,11 @@ export default function CampaignDetailPage() {
               Add Task
             </Button>
           </div>
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800">
+                  <TableRow className="border-slate-200">
                     <TableHead>Task</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Priority</TableHead>
@@ -520,11 +520,11 @@ export default function CampaignDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {campaignTasks.map((task) => (
-                    <TableRow key={task.id} className="border-slate-800/50">
+                    <TableRow key={task.id} className="border-slate-200/50">
                       <TableCell>
                         <p className="font-medium">{task.title}</p>
                         {task.description && (
-                          <p className="text-xs text-slate-500 truncate max-w-xs">
+                          <p className="text-xs text-slate-9000 truncate max-w-xs">
                             {task.description}
                           </p>
                         )}
@@ -580,7 +580,7 @@ export default function CampaignDetailPage() {
             </CardContent>
           </Card>
           {campaignTasks.length === 0 && (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-9000">
               No tasks for this campaign
             </div>
           )}
@@ -588,7 +588,7 @@ export default function CampaignDetailPage() {
 
         {/* Publishers Tab */}
         <TabsContent value="publishers" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Assigned Publishers</CardTitle>
@@ -604,7 +604,7 @@ export default function CampaignDetailPage() {
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800">
+                  <TableRow className="border-slate-200">
                     <TableHead>Publisher</TableHead>
                     <TableHead>Deliverable</TableHead>
                     <TableHead>Budget</TableHead>
@@ -615,10 +615,10 @@ export default function CampaignDetailPage() {
                   {campaignPublishersList.map((cp) => {
                     const pub = publishers.find((p) => p.id === cp.publisher_id)
                     return (
-                      <TableRow key={cp.id} className="border-slate-800/50">
+                      <TableRow key={cp.id} className="border-slate-200/50">
                         <TableCell>
                           <p className="font-medium">{pub?.name}</p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-slate-9000">
                             {pub?.category} • {pub?.city}
                           </p>
                         </TableCell>
@@ -645,7 +645,7 @@ export default function CampaignDetailPage() {
 
         {/* Performance Tab */}
         <TabsContent value="performance" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader>
               <CardTitle>Performance Entries</CardTitle>
               <CardDescription>Daily performance data for this campaign</CardDescription>
@@ -653,7 +653,7 @@ export default function CampaignDetailPage() {
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800">
+                  <TableRow className="border-slate-200">
                     <TableHead>Date</TableHead>
                     <TableHead>Leads</TableHead>
                     <TableHead>Clicks</TableHead>
@@ -665,7 +665,7 @@ export default function CampaignDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {campaignPerformance.map((perf) => (
-                    <TableRow key={perf.id} className="border-slate-800/50">
+                    <TableRow key={perf.id} className="border-slate-200/50">
                       <TableCell className="text-slate-400">
                         {formatDate(perf.date)}
                       </TableCell>
@@ -684,7 +684,7 @@ export default function CampaignDetailPage() {
                           ? formatCurrency(perf.cost_spent / perf.downloads)
                           : "-"}
                       </TableCell>
-                      <TableCell className="text-sm text-slate-500 max-w-xs truncate">
+                      <TableCell className="text-sm text-slate-9000 max-w-xs truncate">
                         {perf.notes || "-"}
                       </TableCell>
                     </TableRow>
@@ -694,7 +694,7 @@ export default function CampaignDetailPage() {
             </CardContent>
           </Card>
           {campaignPerformance.length === 0 && (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-9000">
               No performance data recorded yet
             </div>
           )}
@@ -702,7 +702,7 @@ export default function CampaignDetailPage() {
 
         {/* Client Updates Tab */}
         <TabsContent value="updates" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Client Updates</CardTitle>
@@ -717,7 +717,7 @@ export default function CampaignDetailPage() {
               {campaignUpdates.map((update) => (
                 <div
                   key={update.id}
-                  className="flex gap-4 rounded-lg border border-slate-800 p-4"
+                  className="flex gap-4 rounded-lg border border-slate-200 p-4"
                 >
                   <div className="rounded-full bg-slate-800 p-2 h-fit">
                     <MessageSquare className="h-4 w-4 text-slate-400" />
@@ -727,7 +727,7 @@ export default function CampaignDetailPage() {
                       <Badge variant="outline" className="text-xs">
                         {update.update_type}
                       </Badge>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-slate-9000">
                         {formatDateTime(update.created_at)}
                       </span>
                     </div>
@@ -738,7 +738,7 @@ export default function CampaignDetailPage() {
             </CardContent>
           </Card>
           {campaignUpdates.length === 0 && (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-9000">
               No updates sent yet
             </div>
           )}
@@ -746,7 +746,7 @@ export default function CampaignDetailPage() {
 
         {/* Finance Tab */}
         <TabsContent value="finance" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Invoices</CardTitle>
@@ -760,7 +760,7 @@ export default function CampaignDetailPage() {
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800">
+                  <TableRow className="border-slate-200">
                     <TableHead>Invoice #</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Invoice Date</TableHead>
@@ -771,7 +771,7 @@ export default function CampaignDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {campaignInvoices.map((inv) => (
-                    <TableRow key={inv.id} className="border-slate-800/50">
+                    <TableRow key={inv.id} className="border-slate-200/50">
                       <TableCell className="font-mono">{inv.invoice_number}</TableCell>
                       <TableCell className="font-mono font-medium">
                         {formatCurrency(inv.amount)}
@@ -797,7 +797,7 @@ export default function CampaignDetailPage() {
             </CardContent>
           </Card>
           {campaignInvoices.length === 0 && (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-9000">
               No invoices for this campaign
             </div>
           )}
@@ -805,7 +805,7 @@ export default function CampaignDetailPage() {
 
         {/* Activity Tab */}
         <TabsContent value="activity" className="space-y-4">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader>
               <CardTitle>Activity Log</CardTitle>
               <CardDescription>Recent activities on this campaign</CardDescription>
@@ -818,7 +818,7 @@ export default function CampaignDetailPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm">{log.description}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-9000">
                       {formatDateTime(log.created_at)}
                     </p>
                   </div>
@@ -827,7 +827,7 @@ export default function CampaignDetailPage() {
             </CardContent>
           </Card>
           {campaignLogs.length === 0 && (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-9000">
               No activity recorded yet
             </div>
           )}

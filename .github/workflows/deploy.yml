@@ -1,0 +1,185 @@
+# ========================================
+# Rectoverso OS - Deployment Pipeline
+# Production Deployment via Vercel
+# ========================================
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - preview
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ========================================
+  # Deploy to Vercel
+  # ========================================
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=${{ github.event.inputs.environment || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "preview" ] || [ -z "${{ github.event.inputs.environment }}" ]; then
+            echo "Deploying preview..."
+            vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            echo "Deploying to ${{ github.event.inputs.environment || 'production' }}..."
+            vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --yes
+          fi
+
+      - name: Extract Output
+        id: output
+        run: |
+          echo "url=$(vercel --token=${{ secrets.VERCEL_TOKEN }} --yes)" >> $GITHUB_OUTPUT
+          echo "preview_url=${{ steps.deploy.outputs.url }}" >> $GITHUB_OUTPUT
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Preview deployed to: ${{ steps.deploy.outputs.url }}'
+            })
+
+      - name: Notify Slack
+        if: github.ref == 'refs/heads/main'
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          channel-id: ${{ secrets.SLACK_DEPLOY_CHANNEL }}
+          payload: |
+            {
+              "text": "🚀 Rectoverso OS deployed to ${{ github.event.inputs.environment || 'production' }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Rectoverso OS Deployment*\n• Environment: `${{ github.event.inputs.environment || 'production' }}`\n• Commit: `${{ github.sha }}`\n• Branch: `${{ github.ref_name }}`\n• Deployed by: @${{ github.actor }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  # ========================================
+  # Database Migration (Production Only)
+  # ========================================
+  migrate:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && (github.event.inputs.environment == 'production' || github.event.inputs.environment == '')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Database Migration
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+  # ========================================
+  # Post-Deployment Health Check
+  # ========================================
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Health Check
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: ${{ needs.deploy.outputs.url }}
+          timeout: 120
+          allowed-status-codes: "200,201,204"
+
+      - name: Run Smoke Tests
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" ${{ needs.deploy.outputs.url }}/api/health
+
+  # ========================================
+  # Sync to Production
+  # ========================================
+  sync-production:
+    name: Sync to Production
+    runs-on: ubuntu-latest
+    needs: [deploy, health-check]
+    if: github.ref == 'refs/heads/main' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: ${{ needs.deploy.outputs.url }}
+
+    steps:
+      - name: Sync to Production
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Production URL: ${{ needs.deploy.outputs.url }}"

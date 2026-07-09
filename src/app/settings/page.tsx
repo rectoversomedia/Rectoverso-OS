@@ -23,12 +23,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 const teamMembers = users
 
 const roles = [
-  { id: "founder", name: "Founder / Admin", color: "bg-purple-500/20 text-purple-400" },
-  { id: "campaign_manager", name: "Campaign Manager", color: "bg-cyan-500/20 text-cyan-400" },
-  { id: "campaign_ops", name: "Campaign Operations", color: "bg-blue-500/20 text-blue-400" },
-  { id: "finance", name: "Finance", color: "bg-amber-500/20 text-amber-400" },
-  { id: "sales", name: "Sales", color: "bg-emerald-500/20 text-emerald-400" },
-  { id: "intern", name: "Intern", color: "bg-slate-500/20 text-slate-400" },
+  { id: "founder", name: "Founder / Admin", color: "bg-purple-100 text-purple-700" },
+  { id: "campaign_manager", name: "Campaign Manager", color: "bg-cyan-100 text-cyan-700" },
+  { id: "campaign_ops", name: "Campaign Operations", color: "bg-blue-100 text-blue-700" },
+  { id: "finance", name: "Finance", color: "bg-amber-100 text-amber-700" },
+  { id: "sales", name: "Sales", color: "bg-emerald-100 text-emerald-700" },
+  { id: "intern", name: "Intern", color: "bg-slate-100 text-slate-600" },
 ]
 
 const campaignTypes = [
@@ -44,11 +44,11 @@ const campaignTypes = [
 ]
 
 const taskStatuses = [
-  { id: "todo", name: "Todo", color: "bg-slate-500/20 text-slate-400" },
-  { id: "in_progress", name: "In Progress", color: "bg-blue-500/20 text-blue-400" },
-  { id: "review", name: "Review", color: "bg-purple-500/20 text-purple-400" },
-  { id: "done", name: "Done", color: "bg-emerald-500/20 text-emerald-400" },
-  { id: "blocked", name: "Blocked", color: "bg-red-500/20 text-red-400" },
+  { id: "todo", name: "Todo", color: "bg-slate-100 text-slate-600" },
+  { id: "in_progress", name: "In Progress", color: "bg-blue-100 text-blue-700" },
+  { id: "review", name: "Review", color: "bg-purple-100 text-purple-700" },
+  { id: "done", name: "Done", color: "bg-emerald-100 text-emerald-700" },
+  { id: "blocked", name: "Blocked", color: "bg-red-100 text-red-700" },
 ]
 
 const paymentStatuses = [
@@ -79,15 +79,15 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-50">Settings</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
+        <p className="text-sm text-slate-600">
           Manage team, roles, and system configurations
         </p>
       </div>
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-slate-800/50">
+        <TabsList className="bg-slate-100">
           <TabsTrigger value="team" className="gap-2">
             <Users className="h-4 w-4" />
             Team
@@ -116,7 +116,7 @@ export default function SettingsPage() {
 
         {/* Team Members */}
         <TabsContent value="team" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Team Members</CardTitle>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
               {teamMembers.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="h-12 w-12">
@@ -139,7 +139,7 @@ export default function SettingsPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-slate-200">{member.full_name}</p>
+                      <p className="font-medium text-slate-900">{member.full_name}</p>
                       <p className="text-sm text-slate-500">{member.email}</p>
                     </div>
                   </div>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
 
         {/* Roles */}
         <TabsContent value="roles" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader>
               <CardTitle>User Roles</CardTitle>
               <CardDescription>
@@ -170,7 +170,7 @@ export default function SettingsPage() {
               {roles.map((role) => (
                 <div
                   key={role.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${role.color}`} />
@@ -192,7 +192,7 @@ export default function SettingsPage() {
 
         {/* Campaign Types */}
         <TabsContent value="campaigns" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Campaign Types</CardTitle>
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                 {campaignTypes.map((type, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <span className="text-sm">{type}</span>
                     <Button variant="ghost" size="sm">
@@ -222,7 +222,7 @@ export default function SettingsPage() {
 
         {/* Task Statuses */}
         <TabsContent value="tasks" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Task Statuses</CardTitle>
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                 {taskStatuses.map((status) => (
                   <div
                     key={status.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${status.color}`} />
@@ -255,7 +255,7 @@ export default function SettingsPage() {
 
         {/* Finance Statuses */}
         <TabsContent value="finance" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Finance / Payment Statuses</CardTitle>
@@ -270,7 +270,7 @@ export default function SettingsPage() {
                 {paymentStatuses.map((status) => (
                   <div
                     key={status.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <div>
                       <span className="font-medium">{status.name}</span>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
 
         {/* Publisher Types */}
         <TabsContent value="publishers" className="space-y-6">
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Publisher Types</CardTitle>
@@ -303,7 +303,7 @@ export default function SettingsPage() {
                 {publisherTypes.map((type, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <span className="text-sm">{type}</span>
                     <Button variant="ghost" size="sm">
@@ -318,10 +318,10 @@ export default function SettingsPage() {
       </Tabs>
 
       {/* Database Info */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-cyan-400" />
+            <Database className="h-5 w-5 text-cyan-600" />
             Database Configuration
           </CardTitle>
           <CardDescription>
@@ -335,7 +335,7 @@ export default function SettingsPage() {
               <Input
                 id="supabase_url"
                 placeholder="https://your-project.supabase.co"
-                className="bg-slate-800/50"
+                className="bg-slate-100"
               />
             </div>
             <div className="space-y-2">
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                 id="supabase_key"
                 type="password"
                 placeholder="eyJhbGciOiJIUzI1NiIs..."
-                className="bg-slate-800/50"
+                className="bg-slate-100"
               />
             </div>
           </div>

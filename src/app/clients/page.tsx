@@ -67,8 +67,8 @@ export default function ClientsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">Clients</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900">Clients</h1>
+          <p className="text-sm text-slate-600">
             Manage client relationships and history
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function ClientsPage() {
       </div>
 
       {/* Search */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -87,18 +87,18 @@ export default function ClientsPage() {
               placeholder="Search clients by name or industry..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-slate-800/50"
+              className="pl-10 bg-slate-50"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Clients Table */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-slate-800 hover:bg-transparent">
+              <TableRow className="border-slate-200 hover:bg-transparent">
                 <TableHead>Client</TableHead>
                 <TableHead>Industry</TableHead>
                 <TableHead>PIC</TableHead>
@@ -110,11 +110,11 @@ export default function ClientsPage() {
             </TableHeader>
             <TableBody>
               {filteredClients.map((client) => (
-                <TableRow key={client.id} className="border-slate-800/50">
+                <TableRow key={client.id} className="border-slate-100">
                   <TableCell>
                     <Link
                       href={`/clients/${client.id}`}
-                      className="font-medium hover:text-cyan-400 transition-colors"
+                      className="font-medium text-slate-900 hover:text-cyan-600 transition-colors"
                     >
                       {client.name}
                     </Link>
@@ -124,7 +124,7 @@ export default function ClientsPage() {
                       </p>
                     )}
                   </TableCell>
-                  <TableCell className="text-slate-400">
+                  <TableCell className="text-slate-600">
                     {client.industry}
                   </TableCell>
                   <TableCell>
@@ -153,7 +153,7 @@ export default function ClientsPage() {
                   </TableCell>
                   <TableCell>
                     {client.outstandingPayment > 0 ? (
-                      <span className="font-mono text-amber-400">
+                      <span className="font-mono text-amber-600">
                         {formatCurrency(client.outstandingPayment)}
                       </span>
                     ) : (
@@ -190,7 +190,7 @@ export default function ClientsPage() {
       {filteredClients.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Building2 className="h-12 w-12 text-slate-500 mb-4" />
-          <h3 className="text-lg font-medium text-slate-300">No clients found</h3>
+          <h3 className="text-lg font-medium text-slate-700">No clients found</h3>
           <p className="text-sm text-slate-500 mt-1">
             Try adjusting your search or add a new client.
           </p>

@@ -5,11 +5,9 @@ import Link from "next/link"
 import {
   Plus,
   Search,
-  Filter,
   MoreHorizontal,
   AlertTriangle,
   ExternalLink,
-  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,8 +16,6 @@ import { Progress } from "@/components/ui/progress"
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   DropdownMenu,
@@ -49,7 +45,6 @@ import {
   getProgressPercentage,
   getStatusColor,
 } from "@/lib/utils"
-import { CampaignStatus, HealthStatus } from "@/types"
 
 const campaignTypeLabels: Record<string, string> = {
   lead_generation: "Lead Generation",
@@ -98,8 +93,8 @@ export default function CampaignsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">Campaigns</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900">Campaigns</h1>
+          <p className="text-sm text-slate-500">
             Manage and monitor all campaigns
           </p>
         </div>
@@ -133,21 +128,21 @@ export default function CampaignsPage() {
       </div>
 
       {/* Filters */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search campaigns..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-800/50"
+                className="pl-10 bg-slate-50 border-slate-200"
               />
             </div>
 
             <Select value={clientFilter} onValueChange={setClientFilter}>
-              <SelectTrigger className="w-[200px] bg-slate-800/50">
+              <SelectTrigger className="w-[200px] bg-slate-50 border-slate-200">
                 <SelectValue placeholder="Filter by client" />
               </SelectTrigger>
               <SelectContent>
@@ -161,7 +156,7 @@ export default function CampaignsPage() {
             </Select>
 
             <Select value={healthFilter} onValueChange={setHealthFilter}>
-              <SelectTrigger className="w-[150px] bg-slate-800/50">
+              <SelectTrigger className="w-[150px] bg-slate-50 border-slate-200">
                 <SelectValue placeholder="Health" />
               </SelectTrigger>
               <SelectContent>
@@ -191,11 +186,11 @@ export default function CampaignsPage() {
       </Card>
 
       {/* Campaigns Table */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-slate-800 hover:bg-transparent">
+              <TableRow className="border-slate-100 hover:bg-transparent">
                 <TableHead className="w-[300px]">Campaign</TableHead>
                 <TableHead>Client</TableHead>
                 <TableHead>Type</TableHead>
@@ -209,11 +204,11 @@ export default function CampaignsPage() {
             </TableHeader>
             <TableBody>
               {filteredCampaigns.map((campaign) => (
-                <TableRow key={campaign.id} className="border-slate-800/50">
+                <TableRow key={campaign.id} className="border-slate-50">
                   <TableCell>
                     <Link
                       href={`/campaigns/${campaign.id}`}
-                      className="font-medium hover:text-cyan-400 transition-colors"
+                      className="font-medium text-slate-900 hover:text-cyan-600 transition-colors"
                     >
                       {campaign.name}
                     </Link>
@@ -223,7 +218,7 @@ export default function CampaignsPage() {
                           campaign.payment_status === "overdue"
                             ? "destructive"
                             : campaign.payment_status === "paid"
-                            ? "success"
+                            ? "default"
                             : "secondary"
                         }
                         className="text-[10px]"
@@ -232,7 +227,7 @@ export default function CampaignsPage() {
                       </Badge>
                     </div>
                   </TableCell>
-                  <TableCell className="text-slate-400">
+                  <TableCell className="text-slate-600">
                     {campaign.client?.name}
                   </TableCell>
                   <TableCell>
@@ -284,14 +279,14 @@ export default function CampaignsPage() {
                         }`}
                       />
                       {campaign.health_status === "red" && (
-                        <AlertTriangle className="h-4 w-4 text-red-400" />
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-sm">
+                  <TableCell className="font-mono text-sm text-slate-700">
                     {formatCurrency(campaign.budget)}
                   </TableCell>
-                  <TableCell className="text-slate-400 text-sm">
+                  <TableCell className="text-slate-500 text-sm">
                     {formatDate(campaign.end_date)}
                   </TableCell>
                   <TableCell>
@@ -313,7 +308,7 @@ export default function CampaignsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem>Edit Campaign</DropdownMenuItem>
                         <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-400">
+                        <DropdownMenuItem className="text-red-600">
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -328,10 +323,10 @@ export default function CampaignsPage() {
 
       {filteredCampaigns.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-slate-800 p-4 mb-4">
-            <Search className="h-8 w-8 text-slate-500" />
+          <div className="rounded-full bg-slate-100 p-4 mb-4">
+            <Search className="h-8 w-8 text-slate-400" />
           </div>
-          <h3 className="text-lg font-medium text-slate-300">No campaigns found</h3>
+          <h3 className="text-lg font-medium text-slate-700">No campaigns found</h3>
           <p className="text-sm text-slate-500 mt-1">
             Try adjusting your filters or create a new campaign.
           </p>

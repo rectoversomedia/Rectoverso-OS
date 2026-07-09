@@ -93,8 +93,8 @@ export default function FinancePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">Finance</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900">Finance</h1>
+          <p className="text-sm text-slate-600">
             Track invoices, payments, and cashflow
           </p>
         </div>
@@ -112,11 +112,11 @@ export default function FinancePage() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-slate-400">Total Outstanding</p>
+                <p className="text-sm text-slate-600">Total Outstanding</p>
                 <p className="text-2xl font-bold mt-1">{formatCurrency(totalOutstanding)}</p>
               </div>
               <div className="rounded-full bg-amber-500/10 p-3">
@@ -130,8 +130,8 @@ export default function FinancePage() {
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-slate-400">Paid This Month</p>
-                <p className="text-2xl font-bold mt-1 text-emerald-400">
+                <p className="text-sm text-slate-600">Paid This Month</p>
+                <p className="text-2xl font-bold mt-1 text-emerald-600">
                   {formatCurrency(paidThisMonth)}
                 </p>
               </div>
@@ -146,8 +146,8 @@ export default function FinancePage() {
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-slate-400">Overdue Amount</p>
-                <p className="text-2xl font-bold mt-1 text-red-400">
+                <p className="text-sm text-slate-600">Overdue Amount</p>
+                <p className="text-2xl font-bold mt-1 text-red-600">
                   {formatCurrency(overdueAmount)}
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
@@ -165,14 +165,14 @@ export default function FinancePage() {
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-slate-400">Not Yet Invoiced</p>
+                <p className="text-sm text-slate-600">Not Yet Invoiced</p>
                 <p className="text-2xl font-bold mt-1">{formatCurrency(notInvoicedAmount)}</p>
                 <p className="text-xs text-slate-500 mt-1">
                   {notInvoiced.length} campaigns
                 </p>
               </div>
               <div className="rounded-full bg-cyan-500/10 p-3">
-                <FileText className="h-5 w-5 text-cyan-400" />
+                <FileText className="h-5 w-5 text-cyan-600" />
               </div>
             </div>
           </CardContent>
@@ -182,12 +182,12 @@ export default function FinancePage() {
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Invoices Table */}
-        <Card className="border-slate-800 lg:col-span-2">
+        <Card className="border-slate-200 lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Invoice Overview</CardTitle>
             <div className="flex gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px] bg-slate-800/50">
+                <SelectTrigger className="w-[150px] bg-slate-50">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -205,7 +205,7 @@ export default function FinancePage() {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-slate-800 hover:bg-transparent">
+                <TableRow className="border-slate-200 hover:bg-transparent">
                   <TableHead>Invoice</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead>Amount</TableHead>
@@ -220,7 +220,7 @@ export default function FinancePage() {
                   const aging = getDaysOverdue(inv.due_date)
                   const agingInfo = getInvoiceAging(aging)
                   return (
-                    <TableRow key={inv.id} className="border-slate-800/50">
+                    <TableRow key={inv.id} className="border-slate-200">
                       <TableCell>
                         <p className="font-mono font-medium">{inv.invoice_number}</p>
                         <p className="text-xs text-slate-500">
@@ -238,7 +238,7 @@ export default function FinancePage() {
                       <TableCell className="font-mono font-medium">
                         {formatCurrency(inv.amount)}
                       </TableCell>
-                      <TableCell className="text-slate-400">
+                      <TableCell className="text-slate-600">
                         {formatDate(inv.due_date)}
                       </TableCell>
                       <TableCell>
@@ -268,10 +268,10 @@ export default function FinancePage() {
         <div className="space-y-6">
           {/* Overdue Invoices Alert */}
           {overdueInvoices.length > 0 && (
-            <Card className="border-red-500/30 bg-red-500/5">
+            <Card className="border-red-500/30 bg-red-50/50">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
                   Overdue Invoices
                 </CardTitle>
               </CardHeader>
@@ -279,7 +279,7 @@ export default function FinancePage() {
                 {overdueInvoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="flex items-center justify-between rounded-lg border border-red-500/20 bg-red-500/5 p-3"
+                    className="flex items-center justify-between rounded-lg border border-red-500/20 bg-red-50/50 p-3"
                   >
                     <div>
                       <p className="font-medium">{inv.client?.name}</p>
@@ -288,10 +288,10 @@ export default function FinancePage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono font-bold text-red-400">
+                      <p className="font-mono font-bold text-red-600">
                         {formatCurrency(inv.amount)}
                       </p>
-                      <Button size="sm" variant="outline" className="mt-1 border-red-500/30 text-red-400 hover:bg-red-500/10">
+                      <Button size="sm" variant="outline" className="mt-1 border-red-500/30 text-red-600 hover:bg-red-50">
                         Follow Up
                       </Button>
                     </div>
@@ -302,10 +302,10 @@ export default function FinancePage() {
           )}
 
           {/* Upcoming Due */}
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-amber-400" />
+                <Clock className="h-5 w-5 text-amber-600" />
                 Due This Week
               </CardTitle>
             </CardHeader>
@@ -314,7 +314,7 @@ export default function FinancePage() {
                 upcomingDue.map((inv) => (
                   <div
                     key={inv.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/30 p-3"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3"
                   >
                     <div>
                       <p className="font-medium">{inv.client?.name}</p>
@@ -336,10 +336,10 @@ export default function FinancePage() {
           </Card>
 
           {/* Not Yet Invoiced */}
-          <Card className="border-cyan-500/30 bg-cyan-500/5">
+          <Card className="border-cyan-500/30 bg-cyan-50/50">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-cyan-400" />
+                <FileText className="h-5 w-5 text-cyan-600" />
                 Ready to Invoice
               </CardTitle>
             </CardHeader>
@@ -348,7 +348,7 @@ export default function FinancePage() {
                 notInvoiced.map((camp) => (
                   <div
                     key={camp.id}
-                    className="flex items-center justify-between rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3"
+                    className="flex items-center justify-between rounded-lg border border-cyan-500/20 bg-cyan-50/50 p-3"
                   >
                     <div>
                       <p className="font-medium text-sm">{camp.name}</p>
@@ -356,7 +356,7 @@ export default function FinancePage() {
                         {camp.client?.name}
                       </p>
                     </div>
-                    <Button size="sm" variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+                    <Button size="sm" variant="outline" className="border-cyan-500/30 text-cyan-600 hover:bg-cyan-50">
                       Create Invoice
                     </Button>
                   </div>
@@ -370,10 +370,10 @@ export default function FinancePage() {
           </Card>
 
           {/* AI Suggested Follow Up */}
-          <Card className="border-slate-800">
+          <Card className="border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-cyan-400" />
+                <MessageSquare className="h-5 w-5 text-cyan-600" />
                 AI Follow Up Messages
               </CardTitle>
             </CardHeader>
@@ -381,13 +381,13 @@ export default function FinancePage() {
               {overdueInvoices.slice(0, 2).map((inv) => (
                 <div
                   key={inv.id}
-                  className="rounded-lg border border-slate-800 bg-slate-800/30 p-3"
+                  className="rounded-lg border border-slate-200 bg-slate-50 p-3"
                 >
                   <p className="text-xs text-slate-500 mb-2">For {inv.client?.name}:</p>
-                  <p className="text-sm italic text-slate-300">
+                  <p className="text-sm italic text-slate-700">
                     &quot;Hi Mas/Mba, izin follow up untuk invoice {inv.invoice_number} campaign {inv.campaign?.name} sebesar {formatCurrency(inv.amount)} yang jatuh tempo pada {formatDate(inv.due_date)}. Mohon dibantu update estimasi pembayarannya ya. Terima kasih.&quot;
                   </p>
-                  <Button size="sm" variant="ghost" className="mt-2 text-cyan-400">
+                  <Button size="sm" variant="ghost" className="mt-2 text-cyan-600">
                     Copy Message
                   </Button>
                 </div>

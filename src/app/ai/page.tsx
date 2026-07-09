@@ -278,13 +278,13 @@ Ada yang lain yang bisa saya bantu?`
       {/* Left Sidebar - Context Selection & Suggestions */}
       <div className="w-80 space-y-4 flex flex-col">
         {/* Context Selector */}
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm">Context</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <Select value={selectedContext} onValueChange={setSelectedContext}>
-              <SelectTrigger className="bg-slate-800/50">
+              <SelectTrigger className="bg-slate-50">
                 <SelectValue placeholder="Select context" />
               </SelectTrigger>
               <SelectContent>
@@ -298,7 +298,7 @@ Ada yang lain yang bisa saya bantu?`
 
             {selectedContext === "campaign" && (
               <Select>
-                <SelectTrigger className="bg-slate-800/50">
+                <SelectTrigger className="bg-slate-50">
                   <SelectValue placeholder="Select campaign" />
                 </SelectTrigger>
                 <SelectContent>
@@ -313,7 +313,7 @@ Ada yang lain yang bisa saya bantu?`
 
             {selectedContext === "client" && (
               <Select>
-                <SelectTrigger className="bg-slate-800/50">
+                <SelectTrigger className="bg-slate-50">
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,12 +343,12 @@ Ada yang lain yang bisa saya bantu?`
                   <button
                     key={index}
                     onClick={() => handleSendMessage(suggestion.prompt)}
-                    className="w-full text-left p-3 rounded-lg border border-slate-800 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-colors"
+                    className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-cyan-500/50 hover:bg-cyan-50 transition-colors"
                   >
                     <div className="flex items-start gap-3">
                       <suggestion.icon className="h-5 w-5 text-cyan-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-sm text-slate-200">
+                        <p className="font-medium text-sm text-slate-700">
                           {suggestion.title}
                         </p>
                         <p className="text-xs text-slate-500 mt-0.5">
@@ -368,7 +368,7 @@ Ada yang lain yang bisa saya bantu?`
       <div className="flex-1 flex flex-col">
         <Card className="border-slate-800 flex-1 flex flex-col overflow-hidden">
           {/* Chat Header */}
-          <CardHeader className="border-b border-slate-800 pb-4">
+          <CardHeader className="border-b border-slate-200 pb-4">
             <div className="flex items-center gap-3">
               <div className="rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 p-2">
                 <Brain className="h-5 w-5 text-white" />
@@ -394,7 +394,7 @@ Ada yang lain yang bisa saya bantu?`
                   <div className="rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 p-6 mb-4">
                     <Brain className="h-12 w-12 text-cyan-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-200 mb-2">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
                     Welcome to AI Assistant
                   </h3>
                   <p className="text-sm text-slate-500 max-w-md mb-6">
@@ -443,8 +443,8 @@ Ada yang lain yang bisa saya bantu?`
                       <div
                         className={`max-w-[80%] rounded-lg p-4 ${
                           message.role === "user"
-                            ? "bg-cyan-500/20 border border-cyan-500/30"
-                            : "bg-slate-800/50 border border-slate-700"
+                            ? "bg-cyan-100 border border-cyan-300"
+                            : "bg-slate-100 border border-slate-200"
                         }`}
                       >
                         <div className="flex items-start gap-2 mb-2">
@@ -474,8 +474,8 @@ Ada yang lain yang bisa saya bantu?`
                         <div
                           className={`text-sm whitespace-pre-wrap ${
                             message.role === "user"
-                              ? "text-slate-200"
-                              : "text-slate-300"
+                              ? "text-slate-700"
+                              : "text-slate-600"
                           }`}
                         >
                           {message.content}
@@ -486,10 +486,10 @@ Ada yang lain yang bisa saya bantu?`
 
                   {isTyping && (
                     <div className="flex justify-start">
-                      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                      <div className="bg-slate-100 border border-slate-200 rounded-lg p-4">
                         <div className="flex items-center gap-2">
                           <Brain className="h-4 w-4 text-cyan-400 animate-pulse" />
-                          <span className="text-sm text-slate-400">
+                          <span className="text-sm text-slate-500">
                             AI is thinking...
                           </span>
                           <RefreshCw className="h-4 w-4 text-slate-500 animate-spin" />
@@ -503,7 +503,7 @@ Ada yang lain yang bisa saya bantu?`
           </CardContent>
 
           {/* Input Area */}
-          <div className="border-t border-slate-800 p-4">
+          <div className="border-t border-slate-200 p-4">
             <div className="flex gap-2">
               <Input
                 placeholder="Ask anything about campaigns, tasks, SOPs..."
@@ -514,7 +514,7 @@ Ada yang lain yang bisa saya bantu?`
                     handleSendMessage(inputValue)
                   }
                 }}
-                className="flex-1 bg-slate-800/50"
+                className="flex-1 bg-slate-50"
               />
               <Button
                 onClick={() => inputValue.trim() && handleSendMessage(inputValue)}

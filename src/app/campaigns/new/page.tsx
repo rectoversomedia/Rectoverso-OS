@@ -167,13 +167,13 @@ export default function NewCampaignPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">New Campaign</h1>
+          <h1 className="text-2xl font-bold text-slate-900">New Campaign</h1>
           <p className="text-sm text-slate-400">Create a new campaign for your client</p>
         </div>
       </div>
 
       {/* Progress Steps */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
@@ -182,10 +182,10 @@ export default function NewCampaignPage() {
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
                       currentStep > step.id
-                        ? "border-cyan-500 bg-cyan-500 text-white"
+                        ? "border-cyan-500 bg-cyan-600 text-white"
                         : currentStep === step.id
-                        ? "border-cyan-500 bg-cyan-500/20 text-cyan-400"
-                        : "border-slate-700 text-slate-500"
+                        ? "border-cyan-500 bg-cyan-600/20 text-cyan-400"
+                        : "border-slate-300 text-slate-9000"
                     }`}
                   >
                     {currentStep > step.id ? (
@@ -196,7 +196,7 @@ export default function NewCampaignPage() {
                   </div>
                   <span
                     className={`ml-3 text-sm font-medium hidden md:block ${
-                      currentStep >= step.id ? "text-slate-200" : "text-slate-500"
+                      currentStep >= step.id ? "text-slate-700" : "text-slate-9000"
                     }`}
                   >
                     {step.title}
@@ -205,7 +205,7 @@ export default function NewCampaignPage() {
                 {index < steps.length - 1 && (
                   <div
                     className={`mx-4 h-px w-16 md:w-24 ${
-                      currentStep > step.id ? "bg-cyan-500" : "bg-slate-800"
+                      currentStep > step.id ? "bg-cyan-600" : "bg-slate-800"
                     }`}
                   />
                 )}
@@ -216,7 +216,7 @@ export default function NewCampaignPage() {
       </Card>
 
       {/* Form Content */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-6">
           {/* Step 1: Client & Basic Info */}
           {currentStep === 1 && (
@@ -233,7 +233,7 @@ export default function NewCampaignPage() {
                     value={formData.client_id}
                     onValueChange={(value) => updateFormData("client_id", value)}
                   >
-                    <SelectTrigger className="bg-slate-800/50">
+                    <SelectTrigger className="bg-slate-100">
                       <SelectValue placeholder="Select client" />
                     </SelectTrigger>
                     <SelectContent>
@@ -253,7 +253,7 @@ export default function NewCampaignPage() {
                     placeholder="e.g., Tunaiku App Download Q3 2024"
                     value={formData.name}
                     onChange={(e) => updateFormData("name", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -263,7 +263,7 @@ export default function NewCampaignPage() {
                     value={formData.type}
                     onValueChange={(value) => updateFormData("type", value)}
                   >
-                    <SelectTrigger className="bg-slate-800/50">
+                    <SelectTrigger className="bg-slate-100">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,7 +282,7 @@ export default function NewCampaignPage() {
                     value={formData.pic_id}
                     onValueChange={(value) => updateFormData("pic_id", value)}
                   >
-                    <SelectTrigger className="bg-slate-800/50">
+                    <SelectTrigger className="bg-slate-100">
                       <SelectValue placeholder="Select PIC" />
                     </SelectTrigger>
                     <SelectContent>
@@ -302,7 +302,7 @@ export default function NewCampaignPage() {
                     placeholder="Describe the campaign objective..."
                     value={formData.objective}
                     onChange={(e) => updateFormData("objective", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                     rows={3}
                   />
                 </div>
@@ -310,7 +310,7 @@ export default function NewCampaignPage() {
                 <div className="space-y-2">
                   <Label htmlFor="budget">Budget (IDR) *</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-9000">
                       Rp
                     </span>
                     <Input
@@ -319,14 +319,14 @@ export default function NewCampaignPage() {
                       placeholder="500000000"
                       value={formData.budget}
                       onChange={(e) => updateFormData("budget", e.target.value)}
-                      className="pl-10 bg-slate-800/50"
+                      className="pl-10 bg-slate-100"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="budget_formatted">Budget Preview</Label>
-                  <div className="flex h-10 items-center rounded-md border border-slate-700 bg-slate-800/30 px-3 text-slate-400">
+                  <div className="flex h-10 items-center rounded-md border border-slate-300 bg-slate-100 px-3 text-slate-400">
                     {formData.budget ? formatCurrency(Number(formData.budget)) : "-"}
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function NewCampaignPage() {
                     type="date"
                     value={formData.start_date}
                     onChange={(e) => updateFormData("start_date", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -349,7 +349,7 @@ export default function NewCampaignPage() {
                     type="date"
                     value={formData.end_date}
                     onChange={(e) => updateFormData("end_date", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
               </div>
@@ -371,7 +371,7 @@ export default function NewCampaignPage() {
                     value={formData.kpi_type}
                     onValueChange={(value) => updateFormData("kpi_type", value)}
                   >
-                    <SelectTrigger className="bg-slate-800/50">
+                    <SelectTrigger className="bg-slate-100">
                       <SelectValue placeholder="Select KPI type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -392,7 +392,7 @@ export default function NewCampaignPage() {
                     placeholder="50000"
                     value={formData.kpi_target}
                     onChange={(e) => updateFormData("kpi_target", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -403,7 +403,7 @@ export default function NewCampaignPage() {
                     placeholder="https://landing.page/conversion"
                     value={formData.tracking_link}
                     onChange={(e) => updateFormData("tracking_link", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -414,7 +414,7 @@ export default function NewCampaignPage() {
                     placeholder="facebook, google, instagram"
                     value={formData.utm_source}
                     onChange={(e) => updateFormData("utm_source", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -425,7 +425,7 @@ export default function NewCampaignPage() {
                     placeholder="cpc, content, influencer"
                     value={formData.utm_medium}
                     onChange={(e) => updateFormData("utm_medium", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -436,7 +436,7 @@ export default function NewCampaignPage() {
                     placeholder="campaign_name_q3_2024"
                     value={formData.utm_campaign}
                     onChange={(e) => updateFormData("utm_campaign", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                   />
                 </div>
 
@@ -447,7 +447,7 @@ export default function NewCampaignPage() {
                     placeholder="Additional notes..."
                     value={formData.notes}
                     onChange={(e) => updateFormData("notes", e.target.value)}
-                    className="bg-slate-800/50"
+                    className="bg-slate-100"
                     rows={3}
                   />
                 </div>
@@ -475,7 +475,7 @@ export default function NewCampaignPage() {
                       placeholder={`Deliverable ${index + 1} (e.g., 50,000 app downloads)`}
                       value={deliverable}
                       onChange={(e) => updateDeliverable(index, e.target.value)}
-                      className="bg-slate-800/50"
+                      className="bg-slate-100"
                     />
                     {formData.deliverables.length > 1 && (
                       <Button
@@ -493,15 +493,15 @@ export default function NewCampaignPage() {
                 <Button
                   variant="outline"
                   onClick={addDeliverable}
-                  className="mt-2 border-slate-700"
+                  className="mt-2 border-slate-300"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Deliverable
                 </Button>
               </div>
 
-              <div className="mt-6 rounded-lg border border-slate-800 bg-slate-800/30 p-4">
-                <h4 className="text-sm font-medium text-slate-300 mb-2">
+              <div className="mt-6 rounded-lg border border-slate-200 bg-slate-100 p-4">
+                <h4 className="text-sm font-medium text-slate-600 mb-2">
                   Quick Add Templates
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -553,8 +553,8 @@ export default function NewCampaignPage() {
                       key={publisher.id}
                       className={`flex items-center gap-4 rounded-lg border p-4 cursor-pointer transition-colors ${
                         formData.selectedPublishers.includes(publisher.id)
-                          ? "border-cyan-500 bg-cyan-500/10"
-                          : "border-slate-800 hover:border-slate-700"
+                          ? "border-cyan-500 bg-cyan-600/10"
+                          : "border-slate-200 hover:border-slate-300"
                       }`}
                       onClick={() => togglePublisher(publisher.id)}
                     >
@@ -577,7 +577,7 @@ export default function NewCampaignPage() {
                         <div className="text-sm font-medium">
                           {formatCurrency(publisher.rate || 0)}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-9000">
                           {publisher.audience_size?.toLocaleString()} reach
                         </div>
                       </div>
@@ -585,7 +585,7 @@ export default function NewCampaignPage() {
                   ))}
               </div>
 
-              <div className="mt-4 rounded-lg border border-slate-800 bg-slate-800/30 p-4">
+              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-100 p-4">
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-400">Selected Publishers</span>
                   <span className="font-medium">{formData.selectedPublishers.length}</span>
@@ -603,7 +603,7 @@ export default function NewCampaignPage() {
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <Card className="border-slate-800 bg-slate-800/30">
+                <Card className="border-slate-200 bg-slate-100">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-slate-400">
                       Campaign Details
@@ -611,29 +611,29 @@ export default function NewCampaignPage() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <p className="text-xs text-slate-500">Name</p>
+                      <p className="text-xs text-slate-9000">Name</p>
                       <p className="font-medium">{formData.name || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Client</p>
+                      <p className="text-xs text-slate-9000">Client</p>
                       <p className="font-medium">
                         {clients.find((c) => c.id === formData.client_id)?.name || "-"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Type</p>
+                      <p className="text-xs text-slate-9000">Type</p>
                       <p className="font-medium">
                         {campaignTypes.find((t) => t.value === formData.type)?.label || "-"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Budget</p>
+                      <p className="text-xs text-slate-9000">Budget</p>
                       <p className="font-medium">
                         {formData.budget ? formatCurrency(Number(formData.budget)) : "-"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Period</p>
+                      <p className="text-xs text-slate-9000">Period</p>
                       <p className="font-medium">
                         {formData.start_date} - {formData.end_date}
                       </p>
@@ -641,19 +641,19 @@ export default function NewCampaignPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-slate-800 bg-slate-800/30">
+                <Card className="border-slate-200 bg-slate-100">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-slate-400">KPI Target</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <p className="text-xs text-slate-500">KPI Type</p>
+                      <p className="text-xs text-slate-9000">KPI Type</p>
                       <p className="font-medium">
                         {kpiTypes.find((k) => k.value === formData.kpi_type)?.label || "-"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Target</p>
+                      <p className="text-xs text-slate-9000">Target</p>
                       <p className="font-medium">
                         {formData.kpi_target
                           ? Number(formData.kpi_target).toLocaleString()
@@ -661,7 +661,7 @@ export default function NewCampaignPage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Tracking Link</p>
+                      <p className="text-xs text-slate-9000">Tracking Link</p>
                       <p className="font-medium text-sm truncate">
                         {formData.tracking_link || "-"}
                       </p>
@@ -669,7 +669,7 @@ export default function NewCampaignPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-slate-800 bg-slate-800/30 md:col-span-2">
+                <Card className="border-slate-200 bg-slate-100 md:col-span-2">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-slate-400">
                       Deliverables ({formData.deliverables.filter((d) => d).length})
@@ -689,7 +689,7 @@ export default function NewCampaignPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-slate-800 bg-slate-800/30 md:col-span-2">
+                <Card className="border-slate-200 bg-slate-100 md:col-span-2">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-slate-400">
                       Selected Publishers ({formData.selectedPublishers.length})
@@ -706,15 +706,15 @@ export default function NewCampaignPage() {
                         ) : null
                       })}
                       {formData.selectedPublishers.length === 0 && (
-                        <span className="text-sm text-slate-500">No publishers selected</span>
+                        <span className="text-sm text-slate-9000">No publishers selected</span>
                       )}
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-4">
-                <p className="text-sm text-slate-300">
+              <div className="rounded-lg border border-cyan-500/30 bg-cyan-600/5 p-4">
+                <p className="text-sm text-slate-600">
                   <strong className="text-cyan-400">Note:</strong> After creating this
                   campaign, a checklist of tasks will be automatically generated based on
                   the campaign type and workflow.
@@ -742,9 +742,9 @@ export default function NewCampaignPage() {
               key={step.id}
               className={`h-2 w-2 rounded-full ${
                 step.id === currentStep
-                  ? "bg-cyan-500"
+                  ? "bg-cyan-600"
                   : step.id < currentStep
-                  ? "bg-cyan-500/50"
+                  ? "bg-cyan-600/50"
                   : "bg-slate-700"
               }`}
             />

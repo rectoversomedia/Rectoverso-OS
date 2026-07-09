@@ -1,0 +1,734 @@
+# Rectoverso OS - API Documentation
+
+## Overview
+
+The Rectoverso OS API follows RESTful principles and uses JSON for request/response bodies. All endpoints require authentication unless otherwise specified.
+
+## Base URL
+
+```
+Production: https://api.rectoverso-os.com
+Development: http://localhost:3000
+```
+
+## Authentication
+
+The API uses Bearer token authentication. Include the token in the `Authorization` header:
+
+```
+Authorization: Bearer <your-token>
+```
+
+## Request Format
+
+All requests should include the following headers:
+
+```
+Content-Type: application/json
+Authorization: Bearer <token>
+X-Request-ID: <optional-request-id>
+```
+
+## Response Format
+
+All responses follow this structure:
+
+### Success Response
+
+```json
+{
+  "status": "success",
+  "data": { ... },
+  "meta": {
+    "requestId": "uuid",
+    "timestamp": "2024-01-01T00:00:00.000Z",
+    "version": "1.0.0"
+  }
+}
+```
+
+### Error Response
+
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message",
+    "details": {
+      "field": ["validation error"]
+    }
+  },
+  "meta": {
+    "requestId": "uuid",
+    "timestamp": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+## Pagination
+
+List endpoints support pagination via query parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | integer | 1 | Page number |
+| pageSize | integer | 20 | Items per page (max: 100) |
+| sortBy | string | varies | Field to sort by |
+| sortOrder | string | desc | Sort direction (asc/desc) |
+
+Paginated responses include:
+
+```json
+{
+  "data": {
+    "items": [...],
+    "pagination": {
+      "page": 1,
+      "pageSize": 20,
+      "totalItems": 100,
+      "totalPages": 5,
+      "hasNextPage": true,
+      "hasPreviousPage": false
+    }
+  }
+}
+```
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| VALIDATION_ERROR | 422 | Request validation failed |
+| UNAUTHORIZED | 401 | Authentication required |
+| FORBIDDEN | 403 | Insufficient permissions |
+| NOT_FOUND | 404 | Resource not found |
+| CONFLICT | 409 | Resource already exists |
+| RATE_LIMIT_EXCEEDED | 429 | Too many requests |
+| INTERNAL_ERROR | 500 | Server error |
+
+---
+
+## Endpoints
+
+### Authentication
+
+#### POST /api/auth/login
+
+Login and get access token.
+
+**Request:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ...",
+    "expiresIn": 3600,
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "name": "John Doe",
+      "role": "campaign_manager"
+    }
+  }
+}
+```
+
+#### POST /api/auth/logout
+
+Logout and invalidate token.
+
+**Response (204):** No content
+
+#### POST /api/auth/refresh
+
+Refresh access token.
+
+**Request:**
+```json
+{
+  "refreshToken": "eyJ..."
+}
+```
+
+---
+
+### Users
+
+#### GET /api/users
+
+Get list of users (admin only).
+
+**Query Parameters:**
+- `role` - Filter by role
+- `is_active` - Filter by active status
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "email": "user@example.com",
+        "name": "John Doe",
+        "role": "campaign_manager",
+        "is_active": true,
+        "last_login": "2024-01-01T00:00:00.000Z"
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/users/:id
+
+Get user by ID.
+
+#### POST /api/users
+
+Create new user (admin only).
+
+**Request:**
+```json
+{
+  "email": "newuser@example.com",
+  "name": "New User",
+  "role": "intern",
+  "department": "Marketing"
+}
+```
+
+#### PATCH /api/users/:id
+
+Update user.
+
+#### DELETE /api/users/:id
+
+Delete user (admin only).
+
+---
+
+### Clients
+
+#### GET /api/clients
+
+Get list of clients.
+
+**Query Parameters:**
+- `search` - Search by name
+- `is_active` - Filter by active status
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "name": "Tunaiku",
+        "industry": "Fintech",
+        "contact_person": "John Doe",
+        "contact_email": "contact@tunaiku.com",
+        "is_active": true,
+        "campaigns_count": 5
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/clients/:id
+
+Get client by ID with campaign history.
+
+#### POST /api/clients
+
+Create new client.
+
+**Request:**
+```json
+{
+  "name": "New Client",
+  "industry": "E-commerce",
+  "contact_person": "Jane Doe",
+  "contact_email": "contact@newclient.com",
+  "contact_phone": "+6281234567890"
+}
+```
+
+#### PATCH /api/clients/:id
+
+Update client.
+
+#### DELETE /api/clients/:id
+
+Delete client.
+
+---
+
+### Campaigns
+
+#### GET /api/campaigns
+
+Get list of campaigns.
+
+**Query Parameters:**
+- `status` - Filter by status (can repeat for multiple)
+- `health` - Filter by health status
+- `type` - Filter by campaign type
+- `client_id` - Filter by client
+- `pic_id` - Filter by PIC
+- `date_from` - Start date filter
+- `date_to` - End date filter
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "name": "Tunaiku Lead Gen Q1",
+        "type": "lead_generation",
+        "status": "running",
+        "health": "green",
+        "client": {
+          "id": "uuid",
+          "name": "Tunaiku"
+        },
+        "pic": {
+          "id": "uuid",
+          "name": "Dewi Lestari"
+        },
+        "budget": 50000000,
+        "start_date": "2024-01-01",
+        "end_date": "2024-03-31"
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/campaigns/:id
+
+Get campaign by ID with full details including checklists, tasks, and performance.
+
+#### POST /api/campaigns
+
+Create new campaign.
+
+**Request:**
+```json
+{
+  "client_id": "uuid",
+  "name": "New Campaign",
+  "type": "lead_generation",
+  "status": "draft",
+  "description": "Campaign description",
+  "brief_url": "https://...",
+  "objective": "Generate 1000 leads",
+  "start_date": "2024-01-01T00:00:00Z",
+  "end_date": "2024-03-31T00:00:00Z",
+  "budget": 50000000,
+  "pic_id": "uuid"
+}
+```
+
+#### PATCH /api/campaigns/:id
+
+Update campaign.
+
+#### DELETE /api/campaigns/:id
+
+Delete campaign.
+
+#### GET /api/campaigns/:id/checklists
+
+Get campaign checklists.
+
+#### POST /api/campaigns/:id/checklists
+
+Add checklist item.
+
+#### PATCH /api/campaigns/:id/checklists/:checklistId
+
+Update checklist item.
+
+---
+
+### Tasks
+
+#### GET /api/tasks
+
+Get list of tasks.
+
+**Query Parameters:**
+- `status` - Filter by status
+- `priority` - Filter by priority
+- `campaign_id` - Filter by campaign
+- `owner_id` - Filter by owner
+- `overdue` - Show overdue tasks only
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Setup tracking links",
+        "description": "Create UTM tracking links",
+        "status": "in_progress",
+        "priority": "high",
+        "due_date": "2024-01-15",
+        "owner": {
+          "id": "uuid",
+          "name": "Ahmad Fauzi"
+        },
+        "campaign": {
+          "id": "uuid",
+          "name": "Tunaiku Q1"
+        }
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/tasks/:id
+
+Get task by ID.
+
+#### POST /api/tasks
+
+Create new task.
+
+**Request:**
+```json
+{
+  "title": "New Task",
+  "description": "Task description",
+  "status": "todo",
+  "priority": "medium",
+  "campaign_id": "uuid",
+  "owner_id": "uuid",
+  "due_date": "2024-01-15T00:00:00Z",
+  "sop_id": "uuid"
+}
+```
+
+#### PATCH /api/tasks/:id
+
+Update task.
+
+#### PATCH /api/tasks/:id/status
+
+Update task status only (optimistic update).
+
+**Request:**
+```json
+{
+  "status": "in_progress"
+}
+```
+
+#### DELETE /api/tasks/:id
+
+Delete task.
+
+---
+
+### Publishers
+
+#### GET /api/publishers
+
+Get list of publishers.
+
+**Query Parameters:**
+- `type` - Filter by publisher type
+- `status` - Filter by status
+- `quality_score_min` - Minimum quality score
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "name": "Detik.com",
+        "type": "media",
+        "status": "active",
+        "platform": "Website",
+        "reach": 50000000,
+        "engagement_rate": 2.5,
+        "quality_score": 8
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/publishers/:id
+
+Get publisher by ID.
+
+#### POST /api/publishers
+
+Create new publisher.
+
+#### PATCH /api/publishers/:id
+
+Update publisher.
+
+#### DELETE /api/publishers/:id
+
+Delete publisher.
+
+---
+
+### Invoices
+
+#### GET /api/invoices
+
+Get list of invoices.
+
+**Query Parameters:**
+- `status` - Filter by payment status
+- `client_id` - Filter by client
+- `overdue` - Show overdue invoices only
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "invoice_number": "INV-2024-001",
+        "client": {
+          "id": "uuid",
+          "name": "Tunaiku"
+        },
+        "amount": 50000000,
+        "tax": 5000000,
+        "total": 55000000,
+        "status": "waiting_payment",
+        "issue_date": "2024-01-01",
+        "due_date": "2024-01-31"
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/invoices/:id
+
+Get invoice by ID.
+
+#### POST /api/invoices
+
+Create new invoice.
+
+**Request:**
+```json
+{
+  "client_id": "uuid",
+  "campaign_id": "uuid",
+  "invoice_number": "INV-2024-001",
+  "amount": 50000000,
+  "tax": 5000000,
+  "issue_date": "2024-01-01",
+  "due_date": "2024-01-31",
+  "notes": "Payment within 30 days"
+}
+```
+
+#### PATCH /api/invoices/:id
+
+Update invoice.
+
+#### POST /api/invoices/:id/record-payment
+
+Record payment received.
+
+**Request:**
+```json
+{
+  "paid_amount": 55000000,
+  "paid_date": "2024-01-15",
+  "notes": "Paid via bank transfer"
+}
+```
+
+---
+
+### SOPs
+
+#### GET /api/sops
+
+Get list of SOPs.
+
+**Query Parameters:**
+- `category` - Filter by category
+- `difficulty` - Filter by difficulty
+- `search` - Search in title/description
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Campaign Setup SOP",
+        "category": "Campaign",
+        "difficulty": "medium",
+        "estimated_time": 30,
+        "steps_count": 8
+      }
+    ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/sops/:id
+
+Get SOP by ID with full content and steps.
+
+#### POST /api/sops
+
+Create new SOP.
+
+#### PATCH /api/sops/:id
+
+Update SOP.
+
+#### DELETE /api/sops/:id
+
+Delete SOP.
+
+---
+
+### Dashboard
+
+#### GET /api/dashboard/stats
+
+Get dashboard statistics.
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": {
+    "totalCampaigns": 25,
+    "activeCampaigns": 15,
+    "problemCampaigns": 2,
+    "totalTasks": 150,
+    "pendingTasks": 45,
+    "overdueTasks": 5,
+    "totalClients": 12,
+    "activeClients": 10,
+    "totalRevenue": 500000000,
+    "outstandingPayments": 75000000,
+    "overduePayments": 25000000,
+    "totalLeads": 15000,
+    "totalInvoices": 30
+  }
+}
+```
+
+#### GET /api/dashboard/campaign-health
+
+Get campaign health overview.
+
+#### GET /api/dashboard/upcoming-tasks
+
+Get upcoming tasks (next 7 days).
+
+#### GET /api/dashboard/recent-activity
+
+Get recent activity feed.
+
+---
+
+### File Upload
+
+#### POST /api/upload
+
+Upload a file.
+
+**Request:** `multipart/form-data`
+- `file` - The file to upload
+- `bucket` - Storage bucket (optional, defaults to 'assets')
+- `folder` - Folder path (optional)
+
+**Response (201):**
+```json
+{
+  "status": "success",
+  "data": {
+    "url": "https://storage.example.com/assets/uuid-filename.jpg",
+    "filename": "uuid-filename.jpg",
+    "size": 102400,
+    "type": "image/jpeg"
+  }
+}
+```
+
+---
+
+## Rate Limits
+
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| /api/auth/login | 5 | 15 minutes |
+| /api/campaigns (write) | 30 | 1 minute |
+| /api/uploads | 10 | 1 minute |
+| Default | 60 | 1 minute |
+
+Rate limit headers are included in responses:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Remaining requests
+- `X-RateLimit-Reset`: Reset timestamp
+
+---
+
+## SDKs
+
+Official SDKs are available for:
+
+- JavaScript/TypeScript: `@rectoverso/sdk`
+- Python: `rectoverso-sdk`
+
+---
+
+## Support
+
+For API support, contact:
+- Email: api-support@rectoverso.com
+- Documentation: docs.rectoverso-os.com

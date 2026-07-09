@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import {
   Plus,
   Search,
@@ -52,10 +53,10 @@ const typeLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-  inactive: "bg-slate-500/10 text-slate-400 border-slate-500/30",
-  testing: "bg-amber-500/10 text-amber-400 border-amber-500/30",
-  blacklist: "bg-red-500/10 text-red-400 border-red-500/30",
+  active: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  inactive: "bg-slate-100 text-slate-600 border-slate-200",
+  testing: "bg-amber-100 text-amber-700 border-amber-200",
+  blacklist: "bg-red-100 text-red-700 border-red-200",
 }
 
 export default function PublishersPage() {
@@ -82,8 +83,8 @@ export default function PublishersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">Publishers</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900">Publishers</h1>
+          <p className="text-sm text-slate-600">
             Manage publisher partnerships and channels
           </p>
         </div>
@@ -95,7 +96,7 @@ export default function PublishersPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <p className="text-2xl font-bold">{publishers.length}</p>
             <p className="text-xs text-slate-500">Total Publishers</p>
@@ -117,7 +118,7 @@ export default function PublishersPage() {
             <p className="text-xs text-slate-500">Testing</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-800">
+        <Card className="border-slate-200">
           <CardContent className="p-4">
             <p className="text-2xl font-bold">
               {publishers.reduce((sum, p) => sum + (p.audience_size || 0), 0).toLocaleString()}
@@ -128,7 +129,7 @@ export default function PublishersPage() {
       </div>
 
       {/* Filters */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[300px]">
@@ -137,12 +138,12 @@ export default function PublishersPage() {
                 placeholder="Search publishers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-800/50"
+                className="pl-10 bg-slate-50"
               />
             </div>
 
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px] bg-slate-800/50">
+              <SelectTrigger className="w-[180px] bg-slate-50">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -156,7 +157,7 @@ export default function PublishersPage() {
             </Select>
 
             <Select value={cityFilter} onValueChange={setCityFilter}>
-              <SelectTrigger className="w-[160px] bg-slate-800/50">
+              <SelectTrigger className="w-[160px] bg-slate-50">
                 <SelectValue placeholder="All Cities" />
               </SelectTrigger>
               <SelectContent>
@@ -170,7 +171,7 @@ export default function PublishersPage() {
             </Select>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px] bg-slate-800/50">
+              <SelectTrigger className="w-[150px] bg-slate-50">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -186,11 +187,11 @@ export default function PublishersPage() {
       </Card>
 
       {/* Publishers Table */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-slate-800 hover:bg-transparent">
+              <TableRow className="border-slate-200 hover:bg-transparent">
                 <TableHead>Publisher</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Category</TableHead>
@@ -205,9 +206,11 @@ export default function PublishersPage() {
             </TableHeader>
             <TableBody>
               {filteredPublishers.map((pub) => (
-                <TableRow key={pub.id} className="border-slate-800/50">
+                <TableRow key={pub.id} className="border-slate-100">
                   <TableCell>
-                    <p className="font-medium">{pub.name}</p>
+                    <Link href={`/publishers/${pub.id}`} className="font-medium text-slate-900 hover:text-cyan-600">
+                      {pub.name}
+                    </Link>
                     {pub.notes && (
                       <p className="text-xs text-slate-500 truncate max-w-xs">
                         {pub.notes}
@@ -219,9 +222,9 @@ export default function PublishersPage() {
                       {typeLabels[pub.type]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-slate-400">{pub.category}</TableCell>
+                  <TableCell className="text-slate-600">{pub.category}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1 text-sm text-slate-400">
+                    <div className="flex items-center gap-1 text-sm text-slate-500">
                       <MapPin className="h-3 w-3" />
                       {pub.city}, {pub.province}
                     </div>
@@ -240,7 +243,7 @@ export default function PublishersPage() {
                   <TableCell className="font-mono">
                     {pub.rate ? formatCurrency(pub.rate) : "-"}
                   </TableCell>
-                  <TableCell className="text-slate-400">
+                  <TableCell className="text-slate-600">
                     {pub.audience_size ? pub.audience_size.toLocaleString() : "-"}
                   </TableCell>
                   <TableCell>
@@ -251,7 +254,7 @@ export default function PublishersPage() {
                             ? "text-amber-400 fill-amber-400"
                             : (pub.quality_score || 0) >= 60
                             ? "text-slate-400"
-                            : "text-slate-600"
+                            : "text-slate-300"
                         }`}
                       />
                       <span className="text-sm">{pub.quality_score || "-"}</span>
@@ -292,7 +295,7 @@ export default function PublishersPage() {
       {filteredPublishers.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Search className="h-12 w-12 text-slate-500 mb-4" />
-          <h3 className="text-lg font-medium text-slate-300">No publishers found</h3>
+          <h3 className="text-lg font-medium text-slate-700">No publishers found</h3>
           <p className="text-sm text-slate-500 mt-1">
             Try adjusting your filters or add a new publisher.
           </p>

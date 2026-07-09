@@ -11,7 +11,6 @@ import {
   Play,
   FileText,
   ListChecks,
-  Video,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -90,8 +89,8 @@ export default function SOPLibraryPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">SOP Library</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-slate-900">SOP Library</h1>
+          <p className="text-sm text-slate-500">
             Standard Operating Procedures for Rectoverso workflows
           </p>
         </div>
@@ -102,17 +101,17 @@ export default function SOPLibraryPage() {
       </div>
 
       {/* Info Banner */}
-      <Card className="border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+      <Card className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
-            <div className="rounded-full bg-cyan-500/20 p-3">
-              <BookOpen className="h-6 w-6 text-cyan-400" />
+            <div className="rounded-full bg-cyan-100 p-3">
+              <BookOpen className="h-6 w-6 text-cyan-600" />
             </div>
             <div>
-              <p className="font-medium text-slate-200">
+              <p className="font-medium text-slate-800">
                 Every workflow should have an SOP
               </p>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600">
                 Link SOPs to tasks and checklist items so team members can follow the system,
                 not ask the founder repeatedly.
               </p>
@@ -122,21 +121,21 @@ export default function SOPLibraryPage() {
       </Card>
 
       {/* Filters */}
-      <Card className="border-slate-800">
+      <Card className="border-slate-200">
         <CardContent className="p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search SOPs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-800/50"
+                className="pl-10 bg-slate-50 border-slate-200"
               />
             </div>
 
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[200px] bg-slate-800/50">
+              <SelectTrigger className="w-[200px] bg-slate-50 border-slate-200">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -161,8 +160,8 @@ export default function SOPLibraryPage() {
           return (
             <div key={category}>
               <div className="flex items-center gap-2 mb-4">
-                <Icon className="h-5 w-5 text-cyan-400" />
-                <h2 className="text-lg font-semibold text-slate-200">{category}</h2>
+                <Icon className="h-5 w-5 text-cyan-600" />
+                <h2 className="text-lg font-semibold text-slate-800">{category}</h2>
                 <Badge variant="outline" className="text-xs">
                   {categorySOPs.length} SOPs
                 </Badge>
@@ -172,16 +171,16 @@ export default function SOPLibraryPage() {
                 {categorySOPs.map((sop) => (
                   <Card
                     key={sop.id}
-                    className="border-slate-800 hover:border-slate-700 transition-colors cursor-pointer group"
+                    className="border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer group"
                   >
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-base font-medium group-hover:text-cyan-400 transition-colors">
+                      <CardTitle className="text-base font-medium group-hover:text-cyan-600 transition-colors">
                         {sop.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center gap-4 text-sm text-slate-400">
+                        <div className="flex items-center gap-4 text-sm text-slate-600">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             <span>{sop.estimated_time}</span>
@@ -191,7 +190,7 @@ export default function SOPLibraryPage() {
                           </Badge>
                         </div>
 
-                        <p className="text-sm text-slate-500 line-clamp-2">
+                        <p className="text-sm text-slate-600 line-clamp-2">
                           {sop.content.substring(0, 120)}...
                         </p>
 
@@ -209,11 +208,11 @@ export default function SOPLibraryPage() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                           <span className="text-xs text-slate-500">
                             Updated {formatDate(sop.updated_at)}
                           </span>
-                          <Button variant="ghost" size="sm" className="text-cyan-400" asChild>
+                          <Button variant="ghost" size="sm" className="text-cyan-600" asChild>
                             <Link href={`/sop/${sop.id}`}>
                               View SOP
                               <ChevronRight className="ml-1 h-4 w-4" />
@@ -232,8 +231,8 @@ export default function SOPLibraryPage() {
 
       {filteredSOPs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <BookOpen className="h-12 w-12 text-slate-500 mb-4" />
-          <h3 className="text-lg font-medium text-slate-300">No SOPs found</h3>
+          <BookOpen className="h-12 w-12 text-slate-400 mb-4" />
+          <h3 className="text-lg font-medium text-slate-700">No SOPs found</h3>
           <p className="text-sm text-slate-500 mt-1">
             Try adjusting your search or filters.
           </p>

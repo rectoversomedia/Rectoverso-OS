@@ -33,6 +33,20 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Docker
+docker-compose.override.yml
+
+# Test results
+/test-results/
+/playwright-report/
+/test-results/
+
+# Sentry
+.sentryclirc
+
+# Supabase local dev
+/supabase/.temp/
+
 # vercel
 .vercel
 
