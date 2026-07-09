@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Plus,
   Search,
@@ -14,6 +15,8 @@ import {
   AlertTriangle,
   Circle,
   XCircle,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,6 +27,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -34,9 +38,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { getTasksWithRelations, campaigns, users } from "@/data/mock-data"
 import { formatDate } from "@/lib/utils"
 import { TaskStatus } from "@/types"
+import { showToast } from "@/features/notifications/Toaster"
 
 const statusConfig: Record<TaskStatus, { label: string; color: string; icon: React.ElementType }> = {
   todo: { label: "Todo", color: "bg-slate-100 text-slate-600 border-slate-200", icon: Circle },
@@ -55,11 +68,81 @@ const priorityConfig = {
 
 export default function TasksPage() {
   const tasks = getTasksWithRelations()
+  const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [campaignFilter, setCampaignFilter] = useState<string>("all")
   const [ownerFilter, setOwnerFilter] = useState<string>("all")
+
+  // Dialog states
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<typeof tasks[0] | null>(null)
+
+  // Task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: TaskStatus }) => {
+      // In production, call API
+      await new Promise(resolve => setTimeout(resolve, 500))
+      return { id, status }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      showToast.success("Task updated")
+    },
+    onError: () => {
+      showToast.error("Failed to update task")
+    },
+  })
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (id: string) => {
+      // In production, call API
+      await new Promise(resolve => setTimeout(resolve, 500))
+      return id
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      setIsDeleteDialogOpen(false)
+      setSelectedTask(null)
+      showToast.success("Task deleted")
+    },
+    onError: () => {
+      showToast.error("Failed to delete task")
+    },
+  })
+
+  // Click handlers
+  const handleNewTask = () => {
+    setIsCreateDialogOpen(true)
+  }
+
+  const handleEditTask = (task: typeof tasks[0]) => {
+    setSelectedTask(task)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleDeleteTask = (task: typeof tasks[0]) => {
+    setSelectedTask(task)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleChangeStatus = (task: typeof tasks[0], newStatus: TaskStatus) => {
+    updateTaskMutation.mutate({ id: task.id, status: newStatus })
+  }
+
+  const handleConfirmDelete = () => {
+    if (selectedTask) {
+      deleteTaskMutation.mutate(selectedTask.id)
+    }
+  }
+
+  const handleCardClick = (task: typeof tasks[0]) => {
+    // Navigate to task detail or open edit dialog
+    handleEditTask(task)
+  }
 
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
@@ -96,7 +179,7 @@ export default function TasksPage() {
             Task command center - manage and track all tasks
           </p>
         </div>
-        <Button>
+        <Button onClick={handleNewTask}>
           <Plus className="mr-2 h-4 w-4" />
           New Task
         </Button>
@@ -240,6 +323,7 @@ export default function TasksPage() {
                       <Card
                         key={task.id}
                         className="border-slate-200 hover:border-slate-300 hover:shadow-sm cursor-pointer transition-all"
+                        onClick={() => handleCardClick(task)}
                       >
                         <CardContent className="p-3 space-y-2">
                           <div className="flex items-start justify-between">
@@ -250,16 +334,29 @@ export default function TasksPage() {
                             >
                               {task.priority.toUpperCase()}
                             </span>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
+                            <DropdownMenu onOpenChange={(open) => open && handleCardClick(task)}>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                 <Button variant="ghost" size="icon" className="h-6 w-6">
                                   <MoreHorizontal className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem>Change Status</DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
+                              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuItem onClick={() => handleEditTask(task)}>
+                                  <Pencil className="h-3 w-3 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleChangeStatus(task, status === 'todo' ? 'in_progress' : 'todo')}>
+                                  <Circle className="h-3 w-3 mr-2" />
+                                  Change Status
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() => handleDeleteTask(task)}
+                                  className="text-red-600 focus:text-red-600"
+                                >
+                                  <Trash2 className="h-3 w-3 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
@@ -400,6 +497,113 @@ export default function TasksPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Create Task Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Task</DialogTitle>
+            <DialogDescription>
+              Add a new task to track your work.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-500">
+              Task creation form coming soon. For now, use the API to create tasks.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => {
+              showToast.info("Coming soon", "Task creation form will be available soon")
+              setIsCreateDialogOpen(false)
+            }}>
+              Create Task
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Task Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription>
+              Update task details and status.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedTask && (
+            <div className="py-4 space-y-4">
+              <div>
+                <p className="text-sm font-medium">{selectedTask.title}</p>
+                {selectedTask.description && (
+                  <p className="text-xs text-slate-500 mt-1">{selectedTask.description}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Status</label>
+                <Select
+                  value={selectedTask.status}
+                  onValueChange={(status) => {
+                    if (selectedTask) {
+                      handleChangeStatus(selectedTask, status as TaskStatus)
+                      setIsEditDialogOpen(false)
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todo">Todo</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="review">Review</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                    <SelectItem value="blocked">Blocked</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Task</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this task? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedTask && (
+            <div className="py-4">
+              <p className="font-medium">{selectedTask.title}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteTaskMutation.isPending}
+            >
+              {deleteTaskMutation.isPending ? "Deleting..." : "Delete Task"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

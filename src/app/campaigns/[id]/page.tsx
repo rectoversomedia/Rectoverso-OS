@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   ArrowLeft,
   ArrowRight,
@@ -23,6 +24,8 @@ import {
   Plus,
   MoreHorizontal,
   ChevronDown,
+  Pencil,
+  Trash2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -52,9 +55,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  getCampaignsWithRelations,
-  getChecklistsByCampaign,
-  getTasksWithRelations,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   publishers,
   campaignPublishers,
   performanceEntries,
@@ -70,6 +78,9 @@ import {
   getProgressPercentage,
   getStatusColor,
 } from "@/lib/utils"
+import { queryKeys } from "@/lib/query/client"
+import { showToast, toastMessages } from "@/features/notifications/Toaster"
+import { Spinner } from "@/components/feedback/loading-states"
 
 const phases = [
   { id: "preparation", label: "Preparation", icon: FileText },
@@ -131,15 +142,46 @@ const campaignTypeLabels: Record<string, string> = {
   social_amplification: "Social Amplification",
 }
 
+// ============================================
+// Campaign Detail Page with React Query
+// ============================================
+
 export default function CampaignDetailPage() {
   const params = useParams()
   const campaignId = params.id as string
+  const queryClient = useQueryClient()
 
-  const campaigns = getCampaignsWithRelations()
-  const campaign = campaigns.find((c) => c.id === campaignId)
+  // For demo purposes, we'll use mock data but simulate API calls
+  // In production, replace with: useCampaign(campaignId)
+  const { data: campaignData, isLoading: isLoadingCampaign, error: campaignError } = useQuery({
+    queryKey: queryKeys.campaigns.detail(campaignId),
+    queryFn: async () => {
+      // Simulate API call with mock data
+      const { getCampaignsWithRelations } = await import("@/data/mock-data")
+      const campaigns = getCampaignsWithRelations()
+      return campaigns.find((c) => c.id === campaignId) || null
+    },
+    enabled: !!campaignId,
+  })
 
-  const checklists = getChecklistsByCampaign(campaignId)
-  const campaignTasks = getTasksWithRelations().filter((t) => t.campaign_id === campaignId)
+  const { data: checklists, isLoading: isLoadingChecklists } = useQuery({
+    queryKey: [...queryKeys.campaigns.checklists(campaignId), 'mock'],
+    queryFn: async () => {
+      const { getChecklistsByCampaign } = await import("@/data/mock-data")
+      return getChecklistsByCampaign(campaignId)
+    },
+    enabled: !!campaignId,
+  })
+
+  const { data: campaignTasks, isLoading: isLoadingTasks } = useQuery({
+    queryKey: ['tasks', 'campaign', campaignId],
+    queryFn: async () => {
+      const { getTasksWithRelations } = await import("@/data/mock-data")
+      return getTasksWithRelations().filter((t) => t.campaign_id === campaignId)
+    },
+    enabled: !!campaignId,
+  })
+
   const campaignPublishersList = campaignPublishers.filter(
     (cp) => cp.campaign_id === campaignId
   )
@@ -150,23 +192,57 @@ export default function CampaignDetailPage() {
     (l) => l.entity_type === "campaign" && l.entity_id === campaignId
   )
 
-  const [checklistState, setChecklistState] = useState(
-    Object.fromEntries(checklists.map((c) => [c.id, c.status]))
-  )
+  // Checklist mutation
+  const updateChecklistMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      // In production, call API here
+      return { id, status }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.checklists(campaignId) })
+      showToast.success("Checklist updated")
+    },
+    onError: () => {
+      showToast.error("Failed to update checklist")
+    },
+  })
+
+  const [checklistState, setChecklistState] = useState<Record<string, string>>({})
+
+  // Initialize checklist state when data loads
+  React.useEffect(() => {
+    if (checklists && checklists.length > 0 && Object.keys(checklistState).length === 0) {
+      setChecklistState(Object.fromEntries(checklists.map((c) => [c.id, c.status])))
+    }
+  }, [checklists])
 
   const toggleChecklistItem = (id: string) => {
+    const newStatus = checklistState[id] === "done" ? "todo" : "done"
     setChecklistState((prev) => ({
       ...prev,
-      [id]: prev[id] === "done" ? "todo" : "done",
+      [id]: newStatus,
     }))
+    // Call mutation
+    updateChecklistMutation.mutate({ id, status: newStatus })
   }
 
-  if (!campaign) {
+  // Loading state
+  if (isLoadingCampaign) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <Spinner size="lg" />
+        <p className="mt-4 text-sm text-slate-500">Loading campaign...</p>
+      </div>
+    )
+  }
+
+  // Error state
+  if (campaignError || !campaignData) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
         <h2 className="text-xl font-semibold text-slate-300">Campaign not found</h2>
-        <p className="text-sm text-slate-9000 mt-2">
+        <p className="text-sm text-slate-400 mt-2">
           The campaign you&apos;re looking for doesn&apos;t exist.
         </p>
         <Button className="mt-4" asChild>
@@ -176,14 +252,44 @@ export default function CampaignDetailPage() {
     )
   }
 
+  const campaign = campaignData
   const groupedChecklists = phases.map((phase) => ({
     ...phase,
-    items: checklists.filter((c) => c.phase === phase.id),
+    items: (checklists || []).filter((c) => c.phase === phase.id),
   }))
 
   const completedChecklists = Object.values(checklistState).filter(
     (s) => s === "done"
   ).length
+
+  // Click handlers for interactive elements
+  const handleEditCampaign = () => {
+    showToast.info("Edit campaign", "Opening edit form...")
+  }
+
+  const handleViewLive = () => {
+    if (campaign.tracking_link) {
+      window.open(campaign.tracking_link, '_blank')
+    } else {
+      showToast.warning("No tracking link", "Please set a tracking link first")
+    }
+  }
+
+  const handleAddTask = () => {
+    showToast.info("Add task", "Task creation form coming soon...")
+  }
+
+  const handleAddPublisher = () => {
+    showToast.info("Add publisher", "Publisher selection form coming soon...")
+  }
+
+  const handleCreateInvoice = () => {
+    showToast.info("Create invoice", "Invoice creation form coming soon...")
+  }
+
+  const handleNewUpdate = () => {
+    showToast.info("New update", "Update creation form coming soon...")
+  }
 
   return (
     <div className="space-y-6">
@@ -212,19 +318,22 @@ export default function CampaignDetailPage() {
               <span>{campaign.client?.name}</span>
               <span>•</span>
               <Badge variant="outline" className="text-xs">
-                {campaignTypeLabels[campaign.type]}
+                {campaignTypeLabels[campaign.type] || campaign.type}
               </Badge>
               <span>•</span>
-              <span>PIC: {campaign.pic?.full_name}</span>
+              <span>PIC: {campaign.pic?.full_name || "-"}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleViewLive}>
             <ExternalLink className="mr-2 h-4 w-4" />
             View Live
           </Button>
-          <Button size="sm">Edit Campaign</Button>
+          <Button size="sm" onClick={handleEditCampaign}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit Campaign
+          </Button>
         </div>
       </div>
 
@@ -500,7 +609,7 @@ export default function CampaignDetailPage() {
         <TabsContent value="tasks" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Campaign Tasks</h3>
-            <Button size="sm">
+            <Button size="sm" onClick={handleAddTask}>
               <Plus className="mr-2 h-4 w-4" />
               Add Task
             </Button>
@@ -596,7 +705,7 @@ export default function CampaignDetailPage() {
                   {campaignPublishersList.length} publishers assigned
                 </CardDescription>
               </div>
-              <Button size="sm">
+              <Button size="sm" onClick={handleAddPublisher}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Publisher
               </Button>
@@ -708,7 +817,7 @@ export default function CampaignDetailPage() {
                 <CardTitle>Client Updates</CardTitle>
                 <CardDescription>Timeline of updates sent to client</CardDescription>
               </div>
-              <Button size="sm">
+              <Button size="sm" onClick={handleNewUpdate}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Update
               </Button>
@@ -752,7 +861,7 @@ export default function CampaignDetailPage() {
                 <CardTitle>Invoices</CardTitle>
                 <CardDescription>Campaign-related invoices</CardDescription>
               </div>
-              <Button size="sm">
+              <Button size="sm" onClick={handleCreateInvoice}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Invoice
               </Button>

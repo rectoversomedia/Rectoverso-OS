@@ -12,6 +12,9 @@ import {
   MessageSquare,
   Download,
   TrendingUp,
+  Send,
+  Eye,
+  Copy,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +36,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   getInvoicesWithRelations,
   campaigns,
   clients,
@@ -44,6 +55,7 @@ import {
   getInvoiceAging,
   getStatusColor,
 } from "@/lib/utils"
+import { showToast } from "@/features/notifications/Toaster"
 
 export default function FinancePage() {
   const invoices = getInvoicesWithRelations()
@@ -51,6 +63,39 @@ export default function FinancePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [clientFilter, setClientFilter] = useState<string>("all")
+
+  // Dialog states
+  const [selectedInvoice, setSelectedInvoice] = useState<typeof invoices[0] | null>(null)
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false)
+  const [isFollowUpDialogOpen, setIsFollowUpDialogOpen] = useState(false)
+  const [isCreateInvoiceDialogOpen, setIsCreateInvoiceDialogOpen] = useState(false)
+
+  // Invoice action handlers
+  const handleViewInvoice = (invoice: typeof invoices[0]) => {
+    setSelectedInvoice(invoice)
+    setIsInvoiceDialogOpen(true)
+  }
+
+  const handleFollowUp = (invoice: typeof invoices[0]) => {
+    setSelectedInvoice(invoice)
+    setIsFollowUpDialogOpen(true)
+  }
+
+  const handleCreateInvoice = () => {
+    setIsCreateInvoiceDialogOpen(true)
+  }
+
+  const handleCopyFollowUpMessage = (invoice: typeof invoices[0]) => {
+    const message = `"Hi Mas/Mba, izin follow up untuk invoice ${invoice.invoice_number} campaign ${invoice.campaign?.name} sebesar ${formatCurrency(invoice.amount)} yang jatuh tempo pada ${formatDate(invoice.due_date)}. Mohon dibantu update estimasi pembayarannya ya. Terima kasih."`
+    navigator.clipboard.writeText(message)
+    showToast.success("Message copied", "Follow up message copied to clipboard")
+  }
+
+  const handleCopyInvoiceMessage = (invoice: typeof invoices[0]) => {
+    const message = `Invoice ${invoice.invoice_number}\nAmount: ${formatCurrency(invoice.amount)}\nDue Date: ${formatDate(invoice.due_date)}`
+    navigator.clipboard.writeText(message)
+    showToast.success("Invoice details copied")
+  }
 
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch =
@@ -103,7 +148,7 @@ export default function FinancePage() {
             <Download className="mr-2 h-4 w-4" />
             Export Report
           </Button>
-          <Button>
+          <Button onClick={handleCreateInvoice}>
             <Plus className="mr-2 h-4 w-4" />
             New Invoice
           </Button>
@@ -252,9 +297,32 @@ export default function FinancePage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <MessageSquare className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewInvoice(inv)}
+                            title="View Invoice"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleFollowUp(inv)}
+                            title="Follow Up"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyInvoiceMessage(inv)}
+                            title="Copy Details"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
@@ -291,9 +359,24 @@ export default function FinancePage() {
                       <p className="font-mono font-bold text-red-600">
                         {formatCurrency(inv.amount)}
                       </p>
-                      <Button size="sm" variant="outline" className="mt-1 border-red-500/30 text-red-600 hover:bg-red-50">
-                        Follow Up
-                      </Button>
+                      <div className="flex gap-1 mt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-500/30 text-red-600 hover:bg-red-50"
+                          onClick={() => handleFollowUp(inv)}
+                        >
+                          Follow Up
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleCopyFollowUpMessage(inv)}
+                          title="Copy message"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -356,9 +439,14 @@ export default function FinancePage() {
                         {camp.client?.name}
                       </p>
                     </div>
-                    <Button size="sm" variant="outline" className="border-cyan-500/30 text-cyan-600 hover:bg-cyan-50">
-                      Create Invoice
-                    </Button>
+                    <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-cyan-500/30 text-cyan-600 hover:bg-cyan-50"
+                    onClick={() => showToast.info("Create invoice", "Invoice form coming soon...")}
+                  >
+                    Create Invoice
+                  </Button>
                   </div>
                 ))
               ) : (
@@ -387,7 +475,13 @@ export default function FinancePage() {
                   <p className="text-sm italic text-slate-700">
                     &quot;Hi Mas/Mba, izin follow up untuk invoice {inv.invoice_number} campaign {inv.campaign?.name} sebesar {formatCurrency(inv.amount)} yang jatuh tempo pada {formatDate(inv.due_date)}. Mohon dibantu update estimasi pembayarannya ya. Terima kasih.&quot;
                   </p>
-                  <Button size="sm" variant="ghost" className="mt-2 text-cyan-600">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="mt-2 text-cyan-600"
+                    onClick={() => handleCopyFollowUpMessage(inv)}
+                  >
+                    <Copy className="h-3 w-3 mr-1" />
                     Copy Message
                   </Button>
                 </div>
@@ -396,6 +490,161 @@ export default function FinancePage() {
           </Card>
         </div>
       </div>
+
+      {/* Invoice Detail Dialog */}
+      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invoice Details</DialogTitle>
+            <DialogDescription>
+              View invoice details and perform actions.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="py-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-slate-500">Invoice Number</p>
+                  <p className="font-mono font-medium">{selectedInvoice.invoice_number}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Status</p>
+                  <Badge className={`${getStatusColor(selectedInvoice.status)} border`}>
+                    {selectedInvoice.status.replace("_", " ")}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Amount</p>
+                  <p className="font-mono font-medium">{formatCurrency(selectedInvoice.amount)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Due Date</p>
+                  <p className="font-medium">{formatDate(selectedInvoice.due_date)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Client</p>
+                  <p className="font-medium">{selectedInvoice.client?.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Campaign</p>
+                  <p className="font-medium">{selectedInvoice.campaign?.name || "-"}</p>
+                </div>
+              </div>
+              {selectedInvoice.notes && (
+                <div>
+                  <p className="text-xs text-slate-500">Notes</p>
+                  <p className="text-sm">{selectedInvoice.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
+              Close
+            </Button>
+            {selectedInvoice && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    handleCopyInvoiceMessage(selectedInvoice)
+                    setIsInvoiceDialogOpen(false)
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy
+                </Button>
+                <Button onClick={() => {
+                  handleFollowUp(selectedInvoice)
+                  setIsInvoiceDialogOpen(false)
+                }}>
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Follow Up
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Follow Up Dialog */}
+      <Dialog open={isFollowUpDialogOpen} onOpenChange={setIsFollowUpDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Follow Up Invoice</DialogTitle>
+            <DialogDescription>
+              Send a follow up message to the client.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="py-4 space-y-4">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs text-slate-500 mb-2">Follow up message:</p>
+                <p className="text-sm italic text-slate-700">
+                  &quot;Hi Mas/Mba, izin follow up untuk invoice {selectedInvoice.invoice_number} campaign {selectedInvoice.campaign?.name} sebesar {formatCurrency(selectedInvoice.amount)} yang jatuh tempo pada {formatDate(selectedInvoice.due_date)}. Mohon dibantu update estimasi pembayarannya ya. Terima kasih.&quot;
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    handleCopyFollowUpMessage(selectedInvoice)
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Message
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => {
+                    // In production, integrate with WhatsApp/Email
+                    handleCopyFollowUpMessage(selectedInvoice)
+                    showToast.success("Message ready", "Copy the message and send via WhatsApp")
+                    setIsFollowUpDialogOpen(false)
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Send via WhatsApp
+                </Button>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsFollowUpDialogOpen(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Invoice Dialog */}
+      <Dialog open={isCreateInvoiceDialogOpen} onOpenChange={setIsCreateInvoiceDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Invoice</DialogTitle>
+            <DialogDescription>
+              Create a new invoice for a campaign.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-500">
+              Invoice creation form coming soon. For now, create invoices from the campaign detail page.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateInvoiceDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => {
+              showToast.info("Coming soon", "Invoice creation will be available from campaign pages")
+              setIsCreateInvoiceDialogOpen(false)
+            }}>
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { useState } from "react"
 import {
   ArrowLeft,
   Mail,
@@ -35,6 +36,7 @@ import {
   getInvoicesWithRelations,
 } from "@/data/mock-data"
 import { formatCurrency, formatDate, getProgressPercentage, getStatusColor } from "@/lib/utils"
+import { showToast } from "@/features/notifications/Toaster"
 
 export default function ClientDetailPage() {
   const params = useParams()
@@ -51,6 +53,19 @@ export default function ClientDetailPage() {
   const outstandingPayment = clientInvoices
     .filter((i) => i.status !== "paid" && i.status !== "disputed")
     .reduce((sum, i) => sum + i.amount, 0)
+
+  // Click handlers
+  const handleEditClient = () => {
+    showToast.info("Coming soon", "Client editing functionality coming soon")
+  }
+
+  const handleCreateCampaign = () => {
+    showToast.info("Coming soon", "Campaign creation will be available soon")
+  }
+
+  const handleViewInvoice = (invoice: typeof clientInvoices[0]) => {
+    showToast.info("Invoice details", `Invoice: ${invoice.invoice_number}`)
+  }
 
   if (!client) {
     return (
@@ -105,9 +120,13 @@ export default function ClientDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleEditClient}>
             <Edit className="mr-2 h-4 w-4" />
             Edit Client
+          </Button>
+          <Button onClick={handleCreateCampaign}>
+            <Megaphone className="mr-2 h-4 w-4" />
+            New Campaign
           </Button>
         </div>
       </div>
@@ -254,6 +273,14 @@ export default function ClientDetailPage() {
 
         <TabsContent value="invoices">
           <Card className="border-slate-200">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">Client Invoices</CardTitle>
+              </div>
+              <Button size="sm" onClick={() => showToast.info("Coming soon", "Create invoice from finance page")}>
+                Create Invoice
+              </Button>
+            </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>

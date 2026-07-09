@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { Providers } from "@/lib/query/providers/query-provider"
+import { Toaster } from "@/features/notifications/Toaster"
 import { NotificationProvider } from "@/hooks/use-notifications"
 import "./globals.css"
 
@@ -30,7 +32,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} min-h-screen antialiased`}>
         <NotificationProvider>
-          {children}
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
         </NotificationProvider>
       </body>
     </html>

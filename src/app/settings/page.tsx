@@ -9,6 +9,8 @@ import {
   BookOpen,
   Shield,
   Database,
+  Plus,
+  Pencil,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,8 +19,17 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { users, clients } from "@/data/mock-data"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { showToast } from "@/features/notifications/Toaster"
 
 const teamMembers = users
 
@@ -75,6 +86,38 @@ const publisherTypes = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("team")
 
+  // Dialog states
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false)
+  const [isEditPermissionsOpen, setIsEditPermissionsOpen] = useState(false)
+  const [isEditTypeOpen, setIsEditTypeOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<typeof roles[0] | null>(null)
+  const [selectedType, setSelectedType] = useState<string>("")
+
+  // Click handlers
+  const handleAddMember = () => {
+    setIsAddMemberOpen(true)
+    showToast.info("Coming soon", "Add member form will be available soon")
+  }
+
+  const handleEditMember = (member: typeof users[0]) => {
+    showToast.info("Coming soon", `Edit member: ${member.full_name}`)
+  }
+
+  const handleEditPermissions = (role: typeof roles[0]) => {
+    setSelectedRole(role)
+    setIsEditPermissionsOpen(true)
+  }
+
+  const handleAddType = (type: 'campaign' | 'task' | 'finance' | 'publisher') => {
+    setSelectedType(type)
+    setIsEditTypeOpen(true)
+    showToast.info("Coming soon", "Add new type functionality coming soon")
+  }
+
+  const handleEditType = (typeName: string) => {
+    showToast.info("Coming soon", `Edit type: ${typeName}`)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -124,7 +167,10 @@ export default function SettingsPage() {
                   Manage team members and their roles
                 </CardDescription>
               </div>
-              <Button>Add Member</Button>
+              <Button onClick={handleAddMember}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Member
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               {teamMembers.map((member) => (
@@ -147,7 +193,8 @@ export default function SettingsPage() {
                     <Badge className={roles.find((r) => r.id === member.role)?.color}>
                       {roles.find((r) => r.id === member.role)?.name}
                     </Badge>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditMember(member)}>
+                      <Pencil className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </div>
@@ -181,7 +228,7 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditPermissions(role)}>
                     Edit Permissions
                   </Button>
                 </div>
@@ -200,7 +247,10 @@ export default function SettingsPage() {
                   Manage available campaign types for your campaigns
                 </CardDescription>
               </div>
-              <Button>Add Type</Button>
+              <Button onClick={() => handleAddType('campaign')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Type
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2">
@@ -210,7 +260,8 @@ export default function SettingsPage() {
                     className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <span className="text-sm">{type}</span>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditType(type)}>
+                      <Pencil className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </div>
@@ -230,7 +281,10 @@ export default function SettingsPage() {
                   Configure task workflow statuses
                 </CardDescription>
               </div>
-              <Button>Add Status</Button>
+              <Button onClick={() => handleAddType('task')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Status
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -243,7 +297,8 @@ export default function SettingsPage() {
                       <div className={`w-3 h-3 rounded-full ${status.color}`} />
                       <span className="font-medium">{status.name}</span>
                     </div>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditType(status.name)}>
+                      <Pencil className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </div>
@@ -263,7 +318,10 @@ export default function SettingsPage() {
                   Configure invoice and payment workflow statuses
                 </CardDescription>
               </div>
-              <Button>Add Status</Button>
+              <Button onClick={() => handleAddType('finance')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Status
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -276,7 +334,8 @@ export default function SettingsPage() {
                       <span className="font-medium">{status.name}</span>
                       <p className="text-xs text-slate-500">ID: {status.id}</p>
                     </div>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditType(status.name)}>
+                      <Pencil className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </div>
@@ -296,7 +355,10 @@ export default function SettingsPage() {
                   Configure available publisher/channel types
                 </CardDescription>
               </div>
-              <Button>Add Type</Button>
+              <Button onClick={() => handleAddType('publisher')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Type
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2">
@@ -306,7 +368,8 @@ export default function SettingsPage() {
                     className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                   >
                     <span className="text-sm">{type}</span>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditType(type)}>
+                      <Pencil className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
                   </div>
@@ -353,6 +416,72 @@ export default function SettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Add Member Dialog */}
+      <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogDescription>
+              Add a new member to your team.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-500">
+              Team member invitation functionality coming soon.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Permissions Dialog */}
+      <Dialog open={isEditPermissionsOpen} onOpenChange={setIsEditPermissionsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Role Permissions</DialogTitle>
+            <DialogDescription>
+              Configure permissions for {selectedRole?.name}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-500">
+              Role permissions management coming soon.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditPermissionsOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Type Dialog */}
+      <Dialog open={isEditTypeOpen} onOpenChange={setIsEditTypeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Type</DialogTitle>
+            <DialogDescription>
+              Edit {selectedType}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-slate-500">
+              Type editing functionality coming soon.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditTypeOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

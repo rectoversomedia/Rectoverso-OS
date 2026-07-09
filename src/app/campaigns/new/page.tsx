@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useMutation } from "@tanstack/react-query"
 import {
   ArrowLeft,
   ArrowRight,
@@ -37,6 +38,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { clients, users, publishers } from "@/data/mock-data"
 import { formatCurrency } from "@/lib/utils"
+import { showToast, toastMessages } from "@/features/notifications/Toaster"
 
 const steps = [
   { id: 1, title: "Client & Basic Info", icon: FileText },
@@ -71,6 +73,23 @@ const kpiTypes = [
 export default function NewCampaignPage() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
+
+  // Create campaign mutation
+  const createCampaignMutation = useMutation({
+    mutationFn: async (campaignData: typeof formData) => {
+      // In production, call API here
+      // For demo, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return { id: `camp_${Date.now()}`, ...campaignData }
+    },
+    onSuccess: () => {
+      showToast.success("Campaign created", "Redirecting to campaigns list...")
+      router.push("/campaigns")
+    },
+    onError: (error) => {
+      showToast.error("Failed to create campaign", error instanceof Error ? error.message : "Please try again")
+    },
+  })
 
   // Form state
   const [formData, setFormData] = useState({
@@ -132,9 +151,14 @@ export default function NewCampaignPage() {
   }
 
   const handleSubmit = () => {
-    // In production, this would save to database
-    console.log("Creating campaign:", formData)
-    router.push("/campaigns")
+    // Validate form before submission
+    if (!canProceed()) {
+      showToast.warning("Please complete all required fields")
+      return
+    }
+
+    // Submit via mutation
+    createCampaignMutation.mutate(formData)
   }
 
   const canProceed = () => {
@@ -760,9 +784,18 @@ export default function NewCampaignPage() {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         ) : (
-          <Button onClick={handleSubmit}>
-            <Check className="mr-2 h-4 w-4" />
-            Create Campaign
+          <Button onClick={handleSubmit} disabled={createCampaignMutation.isPending}>
+            {createCampaignMutation.isPending ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                Creating...
+              </>
+            ) : (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Create Campaign
+              </>
+            )}
           </Button>
         )}
       </div>
