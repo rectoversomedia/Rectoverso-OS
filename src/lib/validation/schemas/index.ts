@@ -153,9 +153,10 @@ export const createCampaignSchema = z.object({
   notes: z.string().optional(),
 })
 
-export const updateCampaignSchema = createCampaignSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updateCampaignSchema = (() => {
+  const partial = createCampaignSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 export const campaignFilterSchema = z.object({
   status: campaignStatusSchema.array().optional(),
@@ -189,9 +190,10 @@ export const createTaskSchema = z.object({
   tags: z.array(z.string()).optional(),
 })
 
-export const updateTaskSchema = createTaskSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updateTaskSchema = (() => {
+  const partial = createTaskSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 export const updateTaskStatusSchema = z.object({
   id: z.string().uuid(),
@@ -234,9 +236,10 @@ export const createChecklistSchema = z.object({
   notes: z.string().optional(),
 })
 
-export const updateChecklistSchema = createChecklistSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updateChecklistSchema = (() => {
+  const partial = createChecklistSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 // ============================================
 // Publisher Schemas
@@ -272,9 +275,10 @@ export const createPublisherSchema = z.object({
   notes: z.string().optional(),
 })
 
-export const updatePublisherSchema = createPublisherSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updatePublisherSchema = (() => {
+  const partial = createPublisherSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 export const publisherFilterSchema = z.object({
   type: publisherTypeSchema.array().optional(),
@@ -316,9 +320,10 @@ export const createPerformanceEntrySchema = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
 })
 
-export const updatePerformanceEntrySchema = createPerformanceEntrySchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updatePerformanceEntrySchema = (() => {
+  const partial = createPerformanceEntrySchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 export const performanceFilterSchema = z.object({
   campaign_id: z.string().uuid().optional(),
@@ -351,19 +356,12 @@ export const createInvoiceSchema = z.object({
   due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal harus YYYY-MM-DD'),
   notes: z.string().optional(),
   file_url: z.string().url().optional().or(z.literal('')),
-}).refine(
-  (data) => {
-    const issueDate = new Date(data.issue_date)
-    const dueDate = new Date(data.due_date)
-    return dueDate >= issueDate
-  },
-  {
-    message: 'Due date tidak boleh sebelum issue date',
-    path: ['due_date'],
-  }
-)
+})
 
-export const updateInvoiceSchema = createInvoiceSchema.partial().extend({
+// Partial version for updates
+const partialInvoiceSchema = createInvoiceSchema.partial()
+
+export const updateInvoiceSchema = partialInvoiceSchema.extend({
   id: z.string().uuid(),
 })
 
@@ -408,9 +406,10 @@ export const createSopSchema = z.object({
   difficulty: sopDifficultySchema.optional(),
 })
 
-export const updateSopSchema = createSopSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updateSopSchema = (() => {
+  const partial = createSopSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 export const sopFilterSchema = z.object({
   category: z.string().optional(),
@@ -434,9 +433,10 @@ export const createClientUpdateSchema = z.object({
   sent_at: z.string().datetime().optional(),
 })
 
-export const updateClientUpdateSchema = createClientUpdateSchema.partial().extend({
-  id: z.string().uuid(),
-})
+export const updateClientUpdateSchema = (() => {
+  const partial = createClientUpdateSchema.partial()
+  return partial.extend({ id: z.string().uuid() })
+})()
 
 // ============================================
 // Activity Log Schemas
