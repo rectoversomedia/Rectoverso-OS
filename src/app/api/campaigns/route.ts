@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     const { status, code, message, details } = handleApiError(error, {
-      requestId: request.headers.get('X-Request-ID'),
+      requestId: request.headers.get('X-Request-ID') ?? undefined,
     })
 
     return Response.json(
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     return apiResponse(requestId).created(campaign)
   } catch (error) {
     const { status, code, message, details } = handleApiError(error, {
-      requestId: request.headers.get('X-Request-ID'),
+      requestId: request.headers.get('X-Request-ID') ?? undefined,
     })
 
     return Response.json(
