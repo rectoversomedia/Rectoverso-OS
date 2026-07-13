@@ -311,7 +311,7 @@ CREATE INDEX idx_publishers_status ON publishers(status);
 CREATE INDEX idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
 
 -- =====================================================
--- ROW LEVEL SECURITY (RLS)
+-- ROW LEVEL SECURITY (RLS) - PRODUCTION READY
 -- =====================================================
 
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -327,19 +327,168 @@ ALTER TABLE sops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE client_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 
--- Public read access for all tables (MVP - adjust for production)
-CREATE POLICY "Allow public read" ON users FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON clients FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON campaigns FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON tasks FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON campaign_checklists FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON publishers FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON campaign_publishers FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON performance_entries FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON invoices FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON sops FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON client_updates FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON activity_logs FOR SELECT USING (true);
+-- =====================================================
+-- RLS POLICIES - Authenticated Users Only
+-- =====================================================
+
+-- Helper function to get current user role
+CREATE OR REPLACE FUNCTION get_user_role()
+RETURNS TEXT AS $$
+  SELECT role FROM users WHERE id = auth.uid();
+$$ LANGUAGE SQL SECURITY DEFINER;
+
+-- Helper function to check if user is founder/admin
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN AS $$
+  SELECT get_user_role() IN ('founder', 'admin');
+$$ LANGUAGE SQL SECURITY DEFINER;
+
+-- USERS TABLE - Users can see all users (for team view)
+CREATE POLICY "Authenticated users can view users" ON users
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Only admins can insert users" ON users
+  FOR INSERT WITH CHECK (is_admin() = true);
+
+CREATE POLICY "Only admins can update users" ON users
+  FOR UPDATE USING (is_admin() = true OR id = auth.uid());
+
+CREATE POLICY "Only admins can delete users" ON users
+  FOR DELETE USING (is_admin() = true);
+
+-- CLIENTS TABLE - All authenticated users can read
+CREATE POLICY "Authenticated users can view clients" ON clients
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign managers+ can create clients" ON clients
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+CREATE POLICY "Campaign managers+ can update clients" ON clients
+  FOR UPDATE USING (get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+CREATE POLICY "Only admins can delete clients" ON clients
+  FOR DELETE USING (is_admin() = true);
+
+-- CAMPAIGNS TABLE - All authenticated users can read
+CREATE POLICY "Authenticated users can view campaigns" ON campaigns
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign managers+ can create campaigns" ON campaigns
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+CREATE POLICY "Campaign managers+ can update campaigns" ON campaigns
+  FOR UPDATE USING (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+CREATE POLICY "Only admins can delete campaigns" ON campaigns
+  FOR DELETE USING (is_admin() = true);
+
+-- TASKS TABLE - Read all, write based on role
+CREATE POLICY "Authenticated users can view tasks" ON tasks
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Team members can create tasks" ON tasks
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops', 'sales'));
+
+CREATE POLICY "Task owner or team lead can update tasks" ON tasks
+  FOR UPDATE USING (
+    get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops')
+    OR owner_id = auth.uid()
+  );
+
+CREATE POLICY "Campaign managers+ can delete tasks" ON tasks
+  FOR DELETE USING (get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+-- CAMPAIGN_CHECKLISTS TABLE
+CREATE POLICY "Authenticated users can view checklists" ON campaign_checklists
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign ops+ can manage checklists" ON campaign_checklists
+  FOR ALL USING (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+-- PUBLISHERS TABLE - Read all, write based on role
+CREATE POLICY "Authenticated users can view publishers" ON publishers
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign managers+ can create publishers" ON publishers
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+CREATE POLICY "Campaign managers+ can update publishers" ON publishers
+  FOR UPDATE USING (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+CREATE POLICY "Only admins can delete publishers" ON publishers
+  FOR DELETE USING (is_admin() = true);
+
+-- CAMPAIGN_PUBLISHERS TABLE
+CREATE POLICY "Authenticated users can view campaign_publishers" ON campaign_publishers
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign ops+ can manage campaign_publishers" ON campaign_publishers
+  FOR ALL USING (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+-- PERFORMANCE_ENTRIES TABLE
+CREATE POLICY "Authenticated users can view performance" ON performance_entries
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign ops+ can manage performance entries" ON performance_entries
+  FOR ALL USING (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+-- INVOICES TABLE - Finance has special access
+CREATE POLICY "Authenticated users can view invoices" ON invoices
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Finance+ can create invoices" ON invoices
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'finance'));
+
+CREATE POLICY "Finance+ can update invoices" ON invoices
+  FOR UPDATE USING (get_user_role() IN ('founder', 'admin', 'finance'));
+
+CREATE POLICY "Only admins can delete invoices" ON invoices
+  FOR DELETE USING (is_admin() = true);
+
+-- SOPS TABLE - Read all, write based on role
+CREATE POLICY "Authenticated users can view sops" ON sops
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Admins can create sops" ON sops
+  FOR INSERT WITH CHECK (is_admin() = true);
+
+CREATE POLICY "Admins can update sops" ON sops
+  FOR UPDATE USING (is_admin() = true);
+
+CREATE POLICY "Only admins can delete sops" ON sops
+  FOR DELETE USING (is_admin() = true);
+
+-- CLIENT_UPDATES TABLE
+CREATE POLICY "Authenticated users can view client_updates" ON client_updates
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Campaign ops+ can create client_updates" ON client_updates
+  FOR INSERT WITH CHECK (get_user_role() IN ('founder', 'admin', 'campaign_manager', 'campaign_ops'));
+
+CREATE POLICY "Creator can update client_updates" ON client_updates
+  FOR UPDATE USING (sent_by = auth.uid() OR get_user_role() IN ('founder', 'admin', 'campaign_manager'));
+
+-- ACTIVITY_LOGS TABLE - Read only for most, full for admins
+CREATE POLICY "Team members can view activity logs" ON activity_logs
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Only service role can insert activity logs" ON activity_logs
+  FOR INSERT WITH CHECK (auth.jwt() ->> 'role' = 'service_role');
+
+CREATE POLICY "Only admins can delete activity logs" ON activity_logs
+  FOR DELETE USING (is_admin() = true);
+
+-- =====================================================
+-- ENABLE RLS ON AUTH HELPERS
+-- =====================================================
+
+-- Create function to check if user has specific permission
+CREATE OR REPLACE FUNCTION has_permission(required_role TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN get_user_role() IN ('founder', 'admin', required_role);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- =====================================================
 -- FUNCTIONS

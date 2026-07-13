@@ -204,7 +204,6 @@ volumes:
 x-base-service: &base-service
   build:
     context: .
-    context: .
   user: "1000:1000"
   working_dir: /app
   networks:
@@ -216,8 +215,8 @@ x-base-service: &base-service
     - /tmp:size=100M,mode=1777
 
 x-base-env: &base-env
-  # Supabase
-  NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:5432}
+  # Supabase - Ganti dengan URL Supabase production kamu
+  NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://bgfhhlhoqtxgpmbetrvx.supabase.co}
   NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
   SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
   # Database

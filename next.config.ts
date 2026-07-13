@@ -1,14 +1,38 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // TypeScript dan ESLint harus enabled untuk production
   typescript: {
-    // Disable type checking during build for faster deployment
-    // Run `npm run typecheck` separately to check types
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Enable type checking
   },
   eslint: {
-    // Disable ESLint during build
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false, // Enable ESLint
+  },
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
   },
 };
 

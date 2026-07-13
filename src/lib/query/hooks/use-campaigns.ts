@@ -272,7 +272,7 @@ export function useOptimisticUpdate<T>(
     optimisticUpdate: (
       id: string,
       update: Partial<T>,
-     Updater: (old: T, update: Partial<T>) => T
+      Updater: (old: T, update: Partial<T>) => T
     ) => {
       queryClient.setQueryData<T[]>(queryKey, (old) => {
         if (!old) return old
