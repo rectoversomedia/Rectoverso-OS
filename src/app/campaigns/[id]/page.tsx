@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -210,7 +210,7 @@ export default function CampaignDetailPage() {
   const [checklistState, setChecklistState] = useState<Record<string, string>>({})
 
   // Initialize checklist state when data loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (checklists && checklists.length > 0 && Object.keys(checklistState).length === 0) {
       setChecklistState(Object.fromEntries(checklists.map((c) => [c.id, c.status])))
     }
@@ -409,10 +409,10 @@ export default function CampaignDetailPage() {
         <TabsList className="bg-slate-100">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="checklist">
-            Checklist ({completedChecklists}/{checklists.length})
+            Checklist ({completedChecklists}/{checklists?.length || 0})
           </TabsTrigger>
           <TabsTrigger value="tasks">
-            Tasks ({campaignTasks.length})
+            Tasks ({campaignTasks?.length || 0})
           </TabsTrigger>
           <TabsTrigger value="publishers">
             Publishers ({campaignPublishersList.length})
@@ -535,11 +535,11 @@ export default function CampaignDetailPage() {
               <div>
                 <CardTitle>Campaign Checklist</CardTitle>
                 <CardDescription>
-                  Progress: {completedChecklists} of {checklists.length} completed
+                  Progress: {completedChecklists} of {checklists?.length || 0} completed
                 </CardDescription>
               </div>
               <Progress
-                value={(completedChecklists / checklists.length) * 100}
+                value={checklists && checklists.length > 0 ? (completedChecklists / checklists.length) * 100 : 0}
                 className="w-32"
               />
             </CardHeader>
@@ -596,7 +596,7 @@ export default function CampaignDetailPage() {
                   </div>
                 </div>
               ))}
-              {checklists.length === 0 && (
+              {(checklists?.length || 0) === 0 && (
                 <div className="text-center py-8 text-slate-9000">
                   No checklist items for this campaign
                 </div>
@@ -628,7 +628,7 @@ export default function CampaignDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {campaignTasks.map((task) => (
+                  {(campaignTasks || []).map((task) => (
                     <TableRow key={task.id} className="border-slate-200/50">
                       <TableCell>
                         <p className="font-medium">{task.title}</p>
@@ -688,7 +688,7 @@ export default function CampaignDetailPage() {
               </Table>
             </CardContent>
           </Card>
-          {campaignTasks.length === 0 && (
+          {(campaignTasks?.length || 0) === 0 && (
             <div className="text-center py-8 text-slate-9000">
               No tasks for this campaign
             </div>

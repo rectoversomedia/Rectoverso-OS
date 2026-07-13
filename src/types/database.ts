@@ -714,3 +714,59 @@ export interface ActionResponse<T = unknown> {
   error?: string
   message?: string
 }
+
+// ============================================
+// CRUD INPUT TYPES
+// ============================================
+
+// Users
+export type CreateUser = Database['public']['Tables']['users']['Insert']
+export type UpdateUser = Database['public']['Tables']['users']['Update']
+
+// Clients
+export type CreateClient = Database['public']['Tables']['clients']['Insert']
+export type UpdateClient = Database['public']['Tables']['clients']['Update']
+
+// Campaigns
+export type CreateCampaign = Database['public']['Tables']['campaigns']['Insert']
+export type UpdateCampaign = Database['public']['Tables']['campaigns']['Update']
+
+// Tasks
+export type CreateTask = Database['public']['Tables']['tasks']['Insert']
+export type UpdateTask = Database['public']['Tables']['tasks']['Update']
+
+// Publishers
+export type CreatePublisher = Database['public']['Tables']['publishers']['Insert']
+export type UpdatePublisher = Database['public']['Tables']['publishers']['Update']
+
+// Invoices
+export type CreateInvoice = Database['public']['Tables']['invoices']['Insert']
+export type UpdateInvoice = Database['public']['Tables']['invoices']['Update']
+
+// SOPs - alias for Sop (uppercase for backward compatibility)
+export type SOP = Sop
+export type CreateSOP = Database['public']['Tables']['sops']['Insert']
+export type UpdateSOP = Database['public']['Tables']['sops']['Update']
+
+// ============================================
+// FILTER TYPES
+// ============================================
+
+export interface CampaignFilter {
+  status?: CampaignStatus[]
+  health?: HealthStatus[]
+  type?: CampaignType[]
+  client_id?: string[]
+  pic_id?: string[]
+  search?: string
+}
+
+export interface TaskFilter {
+  status?: TaskStatus[]
+  priority?: TaskPriority[]
+  campaign_id?: string
+  owner_id?: string
+  due_date?: string
+  overdue?: boolean
+  search?: string
+}

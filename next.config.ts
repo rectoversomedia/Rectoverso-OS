@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // TypeScript - ignore build errors untuk development speed
-  // Run `npm run typecheck` separately untuk strict type checking
+  // TypeScript dan ESLint harus enabled untuk production
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Enable type checking
   },
   // Security headers
   async headers() {

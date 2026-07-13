@@ -238,42 +238,45 @@ export class AuditLogService {
     data: AuditLogEntry[]
     total: number
   }> {
+    const page = filters.page ?? 1
+    const pageSize = filters.pageSize ?? 20
+    const from = (page - 1) * pageSize
+    const to = page * pageSize - 1
+
+    // Build query - Supabase chain requires proper typing
     let query = this.supabase
       .from('activity_logs')
       .select('*', { count: 'exact' })
 
+    // Apply filters using eq method
     if (filters.user_id) {
-      query = query.eq('user_id', filters.user_id)
+      ;(query as any).eq('user_id', filters.user_id)
     }
     if (filters.entity_type) {
-      query = query.eq('entity_type', filters.entity_type)
+      ;(query as any).eq('entity_type', filters.entity_type)
     }
     if (filters.entity_id) {
-      query = query.eq('entity_id', filters.entity_id)
+      ;(query as any).eq('entity_id', filters.entity_id)
     }
     if (filters.action) {
-      query = query.eq('action', filters.action)
+      ;(query as any).eq('action', filters.action)
     }
     if (filters.date_from) {
-      query = query.gte('created_at', filters.date_from.toISOString())
+      ;(query as any).gte('created_at', filters.date_from.toISOString())
     }
     if (filters.date_to) {
-      query = query.lte('created_at', filters.date_to.toISOString())
+      ;(query as any).lte('created_at', filters.date_to.toISOString())
     }
 
-    query = query
+    // Apply ordering and pagination
+    const { data, count, error } = await (query as any)
       .order('created_at', { ascending: false })
-      .range(
-        ((filters.page ?? 1) - 1) * (filters.pageSize ?? 20),
-        (filters.page ?? 1) * (filters.pageSize ?? 20) - 1
-      )
-
-    const { data, count, error } = await query
+      .range(from, to)
 
     if (error) throw error
 
     return {
-      data: data as AuditLogEntry[],
+      data: (data || []) as AuditLogEntry[],
       total: count ?? 0,
     }
   }

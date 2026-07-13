@@ -26,7 +26,13 @@ interface RateLimitInfo {
 }
 
 // In-memory store for rate limiting (use Redis for production)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+interface RateLimitRecord {
+  count: number
+  resetTime: number
+  maxRequests: number
+}
+
+const rateLimitStore = new Map<string, RateLimitRecord>()
 
 // ============================================
 // Default Configurations
@@ -139,6 +145,7 @@ export class RateLimiter {
       record = {
         count: 0,
         resetTime: now + this.config.windowMs,
+        maxRequests: this.config.maxRequests,
       }
     }
 

@@ -20,7 +20,6 @@ import {
   Plus,
   ArrowRight,
   Clock,
-  RecentSearchesIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent } from '@/components/ui/dialog'

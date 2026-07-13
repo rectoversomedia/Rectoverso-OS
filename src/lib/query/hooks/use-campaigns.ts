@@ -10,7 +10,7 @@ import {
   useInfiniteQuery,
   useSuspenseQuery,
 } from '@tanstack/react-query'
-import { queryKeys } from '../client.tsx'
+import { queryKeys } from '../client'
 import type {
   Campaign,
   CampaignChecklist,
@@ -37,8 +37,10 @@ async function fetchCampaigns(
   if (filters?.sortOrder) params.set('sortOrder', filters.sortOrder)
   if (filters?.status?.length) filters.status.forEach(s => params.append('status', s))
   if (filters?.health?.length) filters.health.forEach(h => params.append('health', h))
-  if (filters?.client_id) params.set('client_id', filters.client_id)
-  if (filters?.pic_id) params.set('pic_id', filters.pic_id)
+  if (filters?.type?.length) filters.type.forEach(t => params.append('type', t))
+  if (filters?.client_id?.length) filters.client_id.forEach(c => params.append('client_id', c))
+  if (filters?.pic_id?.length) filters.pic_id.forEach(p => params.append('pic_id', p))
+  if (filters?.search) params.set('search', filters.search)
 
   const res = await fetch(`${API_BASE}/campaigns?${params.toString()}`, {
     credentials: 'include',
@@ -49,7 +51,8 @@ async function fetchCampaigns(
     throw error
   }
 
-  return res.json()
+  const data = await res.json() as PaginatedResponse<Campaign>
+  return data
 }
 
 async function fetchCampaign(id: string): Promise<Campaign> {
@@ -138,7 +141,7 @@ export function useCampaigns(
   options?: { enabled?: boolean }
 ) {
   return useQuery({
-    queryKey: queryKeys.campaigns.list(filters),
+    queryKey: queryKeys.campaigns.list(filters as Record<string, unknown>),
     queryFn: () => fetchCampaigns(filters),
     enabled: options?.enabled !== false,
   })
@@ -172,11 +175,14 @@ export function useCampaignChecklists(campaignId: string, options?: { enabled?: 
 export function useInfiniteCampaigns(filters?: CampaignFilter) {
   return useInfiniteQuery({
     queryKey: queryKeys.campaigns.list({ ...filters, useInfinite: true }),
-    queryFn: ({ pageParam }) => fetchCampaigns({ ...filters, page: pageParam }),
+    queryFn: async ({ pageParam }: { pageParam: number }): Promise<PaginatedResponse<Campaign>> => {
+      return fetchCampaigns({ ...filters, page: pageParam })
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (lastPage.data?.pagination?.hasNextPage) {
-        return (lastPage.data.pagination.page ?? 0) + 1
+      const page = lastPage as PaginatedResponse<Campaign>
+      if (page.pagination?.hasNextPage) {
+        return (page.pagination.page ?? 0) + 1
       }
       return undefined
     },

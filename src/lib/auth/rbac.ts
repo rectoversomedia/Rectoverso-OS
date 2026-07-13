@@ -162,10 +162,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'clients:read',
     // Campaigns
     'campaigns:read',
-    // Finance
+    // Finance (covers invoice access)
     'finance:read', 'finance:create', 'finance:update', 'finance:delete', 'finance:export',
-    // Invoices
-    'invoices:read', 'invoices:create', 'invoices:update', 'invoices:delete',
     // Performance
     'performance:read', 'performance:export',
   ],

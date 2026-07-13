@@ -417,4 +417,3 @@ export const uuidSchema = z.string().uuid('Invalid UUID format')
 export const htmlSchema = z
   .string()
   .transform((val) => sanitizeHtml(val))
-  .max(100000, 'Content too long')

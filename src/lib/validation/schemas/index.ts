@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 // Helper to create enum schemas (compatible with Zod)
 const createZodEnum = <T extends readonly string[]>(values: T) =>
-  z.enum(values as [string, ...string[]])
+  z.enum(values as unknown as [string, ...string[]])
 
 // ============================================
 // Common Schemas

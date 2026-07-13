@@ -8,7 +8,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { queryKeys } from '../client.tsx'
+import { queryKeys } from '../client'
 import type {
   Task,
   CreateTask,
@@ -47,7 +47,8 @@ async function fetchTasks(
     throw error
   }
 
-  return res.json()
+  const data = await res.json() as PaginatedResponse<Task>
+  return data
 }
 
 async function fetchTask(id: string): Promise<Task> {
@@ -139,7 +140,7 @@ export function useTasks(
   options?: { enabled?: boolean }
 ) {
   return useQuery({
-    queryKey: queryKeys.tasks.list(filters),
+    queryKey: queryKeys.tasks.list(filters as Record<string, unknown>),
     queryFn: () => fetchTasks(filters),
     enabled: options?.enabled !== false,
   })
@@ -172,11 +173,11 @@ export function useKanbanTasks(campaignId?: string) {
       ])
 
       return {
-        todo: todo.data?.items ?? [],
-        in_progress: inProgress.data?.items ?? [],
-        review: review.data?.items ?? [],
-        done: done.data?.items ?? [],
-        blocked: blocked.data?.items ?? [],
+        todo: todo.data ?? [],
+        in_progress: inProgress.data ?? [],
+        review: review.data ?? [],
+        done: done.data ?? [],
+        blocked: blocked.data ?? [],
       }
     },
     enabled: true,

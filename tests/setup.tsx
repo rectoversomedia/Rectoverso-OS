@@ -4,9 +4,8 @@
  */
 
 import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import { vi, beforeAll, afterEach, afterAll } from 'vitest'
 import { cleanup } from '@testing-library/react'
-import { afterEach, beforeAll, afterAll, vi } from 'vitest'
 
 // ============================================
 // Global Setup
